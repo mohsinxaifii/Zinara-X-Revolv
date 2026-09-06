@@ -1,0 +1,219 @@
+{% if product.metafields.content.image_carousel %}
+  <section class="pdp-image-carousel-container">
+    <button class="carousel-arrow left-arrow">
+      <img src="https://cdn.shopify.com/s/files/1/0661/8336/4792/files/Expand_Arrow_1_-_Copy.png?v=1744182420">
+    </button>
+    <div class="page-width image-carousel">
+      <div class="images-parent-div">
+        {% for image in product.metafields.content.image_carousel.value %}
+          <img src="{{ image | img_url: 'master' }}">
+        {% endfor %}
+      </div>
+    </div>
+    <button class="carousel-arrow right-arrow">
+      <img
+        style="transform: rotate(180deg);"
+        src="https://cdn.shopify.com/s/files/1/0661/8336/4792/files/Expand_Arrow_1_-_Copy.png?v=1744182420"
+      >
+    </button>
+  </section>
+
+  <style>
+    .pdp-image-carousel-container {
+      position: relative;
+      overflow: hidden;
+      margin-top: 50px;
+    }
+
+    .image-carousel {
+      padding: 0;
+      max-width: calc(var(--page-width) - 10rem);
+      position: relative;
+    }
+
+    .images-parent-div {
+      display: flex;
+      gap: 2%;
+      transition: transform 0.5s ease-in-out;
+    }
+
+    .image-carousel img {
+      width: 48%;
+      height: auto;
+      transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+      border-radius: 15px;
+    }
+
+    .image-carousel img.active {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .image-carousel img:not(.active) {
+      opacity: 0.1;
+      transform: scale(0.9);
+    }
+
+    .carousel-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(0);
+      border: none;
+      cursor: pointer;
+      background: transparent;
+      z-index: 10;
+    }
+    .carousel-arrow img {
+      width: 57px;
+      height: auto;
+    }
+
+    .left-arrow {
+      left: 40px;
+    }
+
+    .right-arrow {
+      right: 40px;
+    }
+  </style>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const carouselContainer = document.querySelector('.image-carousel');
+      const carousel = document.querySelector('.images-parent-div');
+      const leftArrow = document.querySelector('.left-arrow');
+      const rightArrow = document.querySelector('.right-arrow');
+      const images = carousel.querySelectorAll('img');
+
+      let currentIndex = 0;
+      const transitionDuration = 500;
+      const autoplayInterval = 3000; // 3 seconds
+
+      function updateCarousel() {
+        const imageStyle = window.getComputedStyle(images[0]);
+        let imageWidth = images[0].offsetWidth + parseInt(imageStyle.marginRight) + parseInt(imageStyle.marginLeft);
+
+        let scrollAmount = currentIndex * imageWidth;
+
+        // Add extra 13px for screens smaller than 756px
+        if (window.innerWidth < 756) {
+          scrollAmount += 13;
+        }
+
+        carousel.style.transition = `transform ${transitionDuration}ms ease-in-out`;
+        carousel.style.transform = `translateX(-${scrollAmount}px)`;
+
+        setTimeout(setActiveImages, transitionDuration);
+      }
+
+      function setActiveImages() {
+        const containerRect = carouselContainer.getBoundingClientRect();
+
+        images.forEach((img) => {
+          const imgRect = img.getBoundingClientRect();
+          if (imgRect.left >= containerRect.left && imgRect.right <= containerRect.right) {
+            img.classList.add('active');
+          } else {
+            img.classList.remove('active');
+          }
+        });
+      }
+
+      function moveLeft() {
+        currentIndex = currentIndex > 0 ? currentIndex - 1 : images.length - 1;
+        updateCarousel();
+      }
+
+      function moveRight() {
+        currentIndex = currentIndex < images.length - 1 ? currentIndex + 1 : 0;
+        updateCarousel();
+      }
+
+      leftArrow.addEventListener('click', () => {
+        moveLeft();
+        resetAutoplay();
+      });
+
+      rightArrow.addEventListener('click', () => {
+        moveRight();
+        resetAutoplay();
+      });
+
+      window.addEventListener('resize', () => {
+        carousel.style.transition = 'none';
+        updateCarousel();
+      });
+
+      setActiveImages();
+
+      // Autoplay
+      let autoplay = setInterval(moveRight, autoplayInterval);
+
+      function resetAutoplay() {
+        clearInterval(autoplay);
+        autoplay = setInterval(moveRight, autoplayInterval);
+      }
+
+      // --- Touch Swipe Implementation ---
+      let touchStartX = 0;
+      let touchEndX = 0;
+
+      carouselContainer.addEventListener('touchstart', (e) => {
+        touchStartX = e.touches[0].clientX;
+      });
+
+      carouselContainer.addEventListener('touchmove', (e) => {
+        touchEndX = e.touches[0].clientX;
+      });
+
+      carouselContainer.addEventListener('touchend', () => {
+        const swipeDistance = touchStartX - touchEndX;
+        if (swipeDistance > 50) {
+          moveRight(); // Swipe left → move right
+        } else if (swipeDistance < -50) {
+          moveLeft(); // Swipe right → move left
+        }
+        resetAutoplay();
+      });
+
+      // Mouse Swipe (For Desktop)
+      let mouseDown = false;
+      let startX = 0;
+
+      carouselContainer.addEventListener('mousedown', (e) => {
+        mouseDown = true;
+        startX = e.clientX;
+      });
+
+      carouselContainer.addEventListener('mouseup', (e) => {
+        if (!mouseDown) return;
+        let endX = e.clientX;
+        let swipeDistance = startX - endX;
+
+        if (swipeDistance > 50) {
+          moveRight();
+        } else if (swipeDistance < -50) {
+          moveLeft();
+        }
+        mouseDown = false;
+        resetAutoplay();
+      });
+
+      carouselContainer.addEventListener('mouseleave', () => {
+        mouseDown = false;
+      });
+    });
+  </script>
+{% endif %}
+{% schema %}
+{
+  "name": "PDP Image Carousel",
+  "settings": [],
+  "blocks": [],
+  "presets": [
+    {
+      "name": "PDP Image Carousel"
+    }
+  ]
+}
+{% endschema %}

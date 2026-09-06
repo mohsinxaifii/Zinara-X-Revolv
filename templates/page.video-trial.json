@@ -1,0 +1,135 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "padding_top": 28,
+        "padding_bottom": 28
+      }
+    },
+    "tah_page_heading_R9VKNg": {
+      "type": "tah-page-heading",
+      "name": "TAH Page Heading",
+      "settings": {}
+    },
+    "video_trial_form_7JRYCt": {
+      "type": "video-trial-form",
+      "settings": {
+        "collection_handle": "ready-to-ship",
+        "booking_successful_content": "ascasdAXSAS",
+        "cta_link": "shopify://collections/ready-to-ship"
+      }
+    },
+    "tah_how_it_works_AY4bKd": {
+      "type": "tah-how-it-works",
+      "settings": {
+        "heading": "How it works",
+        "image_1": "shopify://shop_images/select_tah.png",
+        "text_1": "Pick up to 10 designs and try them on over a video call",
+        "image_2": "shopify://shop_images/call_tah.png",
+        "text_2": "A Zinara expert will guide you and showcase the pieces live on a video call.",
+        "image_3": "shopify://shop_images/cart_tah.png",
+        "text_3": "Love it on the video call? Make it yours instantly."
+      }
+    },
+    "collapsible_content_kQiERJ": {
+      "type": "collapsible-content",
+      "blocks": {
+        "collapsible_row_3mHDUt": {
+          "type": "collapsible_row",
+          "settings": {
+            "heading": "What is the Video Trial service?",
+            "icon": "none",
+            "row_content": "<p>Our <em>Video Trial</em> lets you explore and try on Zinara’s jewellery virtually through a live video call with our expert stylist—perfect for when you prefer the convenience of home without an in-person visit.</p>",
+            "page": ""
+          }
+        },
+        "collapsible_row_dye9Wh": {
+          "type": "collapsible_row",
+          "settings": {
+            "heading": "How does it work?",
+            "icon": "none",
+            "row_content": "<p>Once you book a slot, you’ll receive a video call link. During the call, our stylist will showcase the pieces you’ve selected, try them on for you (if you'd like), and guide you through styling tips and details.</p>",
+            "page": ""
+          }
+        },
+        "collapsible_row_TbtQwe": {
+          "type": "collapsible_row",
+          "settings": {
+            "heading": "Is the Video Trial free?",
+            "icon": "none",
+            "row_content": "<p>Yes, it’s completely free—no hidden charges or obligation to purchase.</p>",
+            "page": ""
+          }
+        },
+        "collapsible_row_83gDcj": {
+          "type": "collapsible_row",
+          "settings": {
+            "heading": "Can I make a purchase during the video call?",
+            "icon": "none",
+            "row_content": "<p>Absolutely! If you fall in love with a piece, our stylist will assist you with the purchase right on the call.</p>",
+            "page": ""
+          }
+        },
+        "collapsible_row_hrCGKr": {
+          "type": "collapsible_row",
+          "settings": {
+            "heading": "Can I include someone else in the video call?",
+            "icon": "none",
+            "row_content": "<p>Yes, you can invite a friend or family member to join the call if you'd like a second opinion.</p>",
+            "page": ""
+          }
+        },
+        "collapsible_row_RecWdJ": {
+          "type": "collapsible_row",
+          "settings": {
+            "heading": "What if I miss my appointment?",
+            "icon": "none",
+            "row_content": "<p>No worries—you can reschedule easily using your confirmation email or reach out to our support team.</p>",
+            "page": ""
+          }
+        }
+      },
+      "block_order": [
+        "collapsible_row_3mHDUt",
+        "collapsible_row_dye9Wh",
+        "collapsible_row_TbtQwe",
+        "collapsible_row_83gDcj",
+        "collapsible_row_hrCGKr",
+        "collapsible_row_RecWdJ"
+      ],
+      "name": "t:sections.collapsible_content.presets.name",
+      "settings": {
+        "caption": "",
+        "heading": "FAQs",
+        "heading_size": "h1",
+        "heading_alignment": "center",
+        "layout": "none",
+        "color_scheme": "",
+        "container_color_scheme": "",
+        "open_first_collapsible_row": false,
+        "image_ratio": "adapt",
+        "desktop_layout": "image_second",
+        "padding_top": 36,
+        "padding_bottom": 36
+      }
+    }
+  },
+  "order": [
+    "main",
+    "tah_page_heading_R9VKNg",
+    "video_trial_form_7JRYCt",
+    "tah_how_it_works_AY4bKd",
+    "collapsible_content_kQiERJ"
+  ]
+}

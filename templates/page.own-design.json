@@ -1,0 +1,156 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "padding_top": 28,
+        "padding_bottom": 28
+      }
+    },
+    "get_your_own_design_AWdJ3W": {
+      "type": "get-your-own-design",
+      "blocks": {
+        "image_block_2_pyJEGb": {
+          "type": "image-block-2",
+          "settings": {
+            "image": "shopify://shop_images/Conceptualize.png",
+            "heading": "Conceptualize",
+            "description": "Share your inspiration, and we’ll craft unique designs tailored to your vision."
+          }
+        },
+        "image_block_2_KRdhQp": {
+          "type": "image-block-2",
+          "settings": {
+            "image": "shopify://shop_images/Design_Approval.png",
+            "heading": "Design Approval",
+            "description": "Our team transforms your vision into a realistic product image for your approval before we begin crafting."
+          }
+        },
+        "image_block_2_HJdYp4": {
+          "type": "image-block-2",
+          "settings": {
+            "image": "shopify://shop_images/Ready_to_Wear.png",
+            "heading": "Ready to Wear",
+            "description": "Once approved, your custom jewellery is crafted and carefully prepared, ready to be worn and cherished."
+          }
+        }
+      },
+      "block_order": [
+        "image_block_2_pyJEGb",
+        "image_block_2_KRdhQp",
+        "image_block_2_HJdYp4"
+      ],
+      "settings": {
+        "heading": "How it works",
+        "heading_2": "Crafted to your choice",
+        "description": "<p>Select the metal, diamond carat, and colour you love. We'll craft it to suit your style and budget.</p>"
+      }
+    },
+    "collapsible_content_3HTqGh": {
+      "type": "collapsible-content",
+      "blocks": {
+        "collapsible_row_iDjHMk": {
+          "type": "collapsible_row",
+          "settings": {
+            "heading": "What types of jewellery can I customize with Zinara?",
+            "icon": "none",
+            "row_content": "<p>You can customize rings, earrings, pendants, bracelets, and more. Whether you're designing an engagement ring or a gift for yourself, our team will work with you to bring your idea to life.</p>",
+            "page": ""
+          }
+        },
+        "collapsible_row_DTBRay": {
+          "type": "collapsible_row",
+          "settings": {
+            "heading": "How does the customization process work?",
+            "icon": "none",
+            "row_content": "<p>It's simple! Share your inspiration—whether it's a sketch, a reference image, or just an idea. Our design experts will get in touch to understand your vision and create digital renders or CAD models for your approval before we craft the final piece.</p>",
+            "page": ""
+          }
+        },
+        "collapsible_row_4cjhmy": {
+          "type": "collapsible_row",
+          "settings": {
+            "heading": "How long does it take to create a custom piece?",
+            "icon": "none",
+            "row_content": "<p>Typically, it takes <strong>2 to 4 weeks</strong> from design finalization to delivery. If you have a specific timeline, let us know—we’ll do our best to meet it.</p>",
+            "page": ""
+          }
+        },
+        "collapsible_row_eaYBL3": {
+          "type": "collapsible_row",
+          "settings": {
+            "heading": "Can I choose the metal and diamond size/shape for my design?",
+            "icon": "none",
+            "row_content": "<p>Absolutely. You can select from solid gold or 18KT gold vermeil on 925 silver, and lab-grown diamonds of your preferred size, cut, and quality.</p>",
+            "page": ""
+          }
+        },
+        "collapsible_row_HBQT3j": {
+          "type": "collapsible_row",
+          "settings": {
+            "heading": "Will my custom jewellery be certified?",
+            "icon": "none",
+            "row_content": "<p>Yes, all custom pieces using lab-grown diamonds will come with <strong>IGI certification</strong> and a lifetime buyback and authenticity guarantee from Zinara. In addition to this gold will be hallmarked from BIS</p>",
+            "page": ""
+          }
+        },
+        "collapsible_row_9BEFaU": {
+          "type": "collapsible_row",
+          "settings": {
+            "heading": "What is the payment structure for custom jewellery orders?",
+            "icon": "none",
+            "row_content": "<p>We require a 50% advance payment to begin the design and production process. The remaining 50% is payable at the time of dispatch or delivery.</p>",
+            "page": ""
+          }
+        },
+        "collapsible_row_LeL6RC": {
+          "type": "collapsible_row",
+          "settings": {
+            "heading": "How do I get started?",
+            "icon": "none",
+            "row_content": "<p>Click the <strong>“Whatsapp Us”</strong> button and message us directly. Our team will schedule a quick consultation to kick off your custom journey.</p>",
+            "page": ""
+          }
+        }
+      },
+      "block_order": [
+        "collapsible_row_iDjHMk",
+        "collapsible_row_DTBRay",
+        "collapsible_row_4cjhmy",
+        "collapsible_row_eaYBL3",
+        "collapsible_row_HBQT3j",
+        "collapsible_row_9BEFaU",
+        "collapsible_row_LeL6RC"
+      ],
+      "settings": {
+        "caption": "",
+        "heading": "FAQs",
+        "heading_size": "h1",
+        "heading_alignment": "center",
+        "layout": "none",
+        "color_scheme": "",
+        "container_color_scheme": "",
+        "open_first_collapsible_row": false,
+        "image_ratio": "adapt",
+        "desktop_layout": "image_second",
+        "padding_top": 36,
+        "padding_bottom": 36
+      }
+    }
+  },
+  "order": [
+    "main",
+    "get_your_own_design_AWdJ3W",
+    "collapsible_content_3HTqGh"
+  ]
+}

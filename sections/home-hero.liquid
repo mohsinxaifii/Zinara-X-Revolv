@@ -1,0 +1,103 @@
+<section class="page-width home-hero-section">
+  <img
+    src="{{ section.settings.image | image_url }}"
+    class="home-hero__image lazyload"
+    loading="lazy"
+    width="{{ section.settings.image.width }}"
+    height="{{ section.settings.image.height }}"
+    alt=""
+    style="aspect-ratio: {{ section.settings.image.aspect_ratio }};"
+  >
+
+  <div class="home-hero__content">
+    <h1>{{ section.settings.heading }}</h1>
+    <p>{{ section.settings.subheading }}</p>
+    <a href="{{ section.settings.button }}" class="btn btn-primary">{{ section.settings.button }}</a>
+  </div>
+</section>
+<style>
+  .home-hero-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 40px;
+    text-align: center;
+    margin-bottom: 60px;
+    gap: 40px;
+    letter-spacing: 0;
+  }
+  .home-hero-section img {
+    width: 60%;
+    height: auto;
+    display: flex;
+  }
+  .home-hero__content {
+    width: 40%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    letter-spacing: 0;
+  }
+  .home-hero-section h1 {
+    font-size: 2.5rem;
+    font-weight: 400;
+    margin: 0;
+  }
+  .home-hero-section p {
+    font-size: 1.2rem;
+    margin: 20px 0;
+    font-weight: 400;
+    line-height: 2rem;
+    width: 80%;
+  }
+  .home-hero-section a {
+    font-size: 1.4rem;
+    color: #712242;
+    text-decoration: none;
+    border: solid 1px #712242;
+    padding: 5px 25px;
+    font-weight: 400;
+    transition: all ease-in 0.15s;
+  }
+  .home-hero-section a:hover {
+    background-color: #712242;
+    color: #fff;
+    transition: all ease-in 0.15s;
+  }
+</style>
+{% schema %}
+{
+  "name": "Home Hero Section",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Hero Image"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Section Heading",
+      "default": "Diamonds that Dazzle"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Section Subheading",
+      "default": "For complete peace of mind, choose from our exquisite collection of jewellery, featuring only BIS hallmarked gold and IGI certified lab-grown diamonds. "
+    },
+    {
+      "type": "text",
+      "id": "button",
+      "label": "Button",
+      "default": "Shop now"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Home Hero Section"
+    }
+  ]
+}
+{% endschema %}

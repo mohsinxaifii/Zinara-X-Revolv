@@ -1,0 +1,173 @@
+<section class="page-width occasion-images-container-parent">
+  <h2 class="section-heading">{{ section.settings.heading }}</h2>
+  <div class="occasion-images-container">
+    {% for block in section.blocks %}
+      <div class="occasion-tab-content" id="{{ block.id }}">
+        <a href="{{ collections[block.settings.collection].url }}">
+          <div class="image-container">
+            <img src="{{ block.settings.image | image_url }}" alt="{{ block.settings.text }}">
+            <p>{{ block.settings.text }}</p>
+          </div>
+        </a>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const occasionLinks = document.querySelectorAll('.occasion-tab-content a');
+
+    occasionLinks.forEach((link) => {
+      link.addEventListener('click', function (e) {
+        const occasionName = link.querySelector('p')?.innerText || 'Unknown';
+        const occasionUrl = link.href || 'Unknown';
+        const currentUrl = window.location.href;
+
+        // Prevent immediate navigation
+        e.preventDefault();
+
+        // Customer data
+        const customer = window.customer || {};
+        const address = customer.default_address || {};
+
+        const customerInfo = {
+          customer_id: customer.id || null,
+          customer_email: customer.email || null,
+          customer_name: `${customer.first_name || ''} ${customer.last_name || ''}`.trim(),
+          customer_phone: customer.phone || null,
+          customer_address: `${address.address1 || ''}, ${address.city || ''}, ${address.province || ''}, ${
+            address.zip || ''
+          }, ${address.country || ''}`.trim(),
+        };
+
+        // ✅ Send event to GA4
+        gtag('event', 'occasion_click', {
+          occasion_name: occasionName,
+          occasion_url: occasionUrl,
+          page_title: document.title,
+          page_location: currentUrl,
+          ...customerInfo,
+        });
+
+        // ✅ Send event to Meta Pixel
+        if (typeof fbq === 'function') {
+          fbq('trackCustom', 'occasion_click', {
+            occasion_name: occasionName,
+            occasion_url: occasionUrl,
+            page_title: document.title,
+            page_location: currentUrl,
+            ...customerInfo,
+          });
+        }
+
+        console.log('occasion_click sent:', {
+          occasion_name: occasionName,
+          occasion_url: occasionUrl,
+          ...customerInfo,
+        });
+
+        // Redirect after slight delay
+        setTimeout(() => {
+          window.location.href = occasionUrl;
+        }, 300);
+      });
+    });
+  });
+</script>
+
+<style>
+  .occasion-images-container {
+    display: flex;
+    justify-content: start;
+    align-items: start;
+    overflow-x: auto;
+    gap: 1.2%;
+  }
+
+  .occasion-tab-content {
+    position: relative;
+    width: 24%;
+    flex-shrink: 0;
+  }
+
+  .image-container {
+    position: relative;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .image-container img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 30px 0 30px 0;
+  }
+
+  .image-container p {
+    /* position: absolute;
+    bottom: 0; */
+    /* left: 50%; */
+    /* transform: translateX(-50%); */
+    margin: 0;
+    padding: 5px 10px;
+    color: #121212;
+    text-align: center;
+    text-wrap: nowrap;
+    font-weight: 500;
+    letter-spacing: 0;
+  }
+  .occasion-tab-content a {
+    text-decoration: none;
+  }
+  @media (max-width: 756px) {
+    .image-container p {
+      font-size: 1.4rem !important;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Shop by Occasion",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Section Heading",
+      "default": "Shop by Category"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "tab",
+      "name": "Category Tab",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "Occasion"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Select Collection"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Shop by Occasion",
+      "category": "Custom"
+    }
+  ]
+}
+{% endschema %}

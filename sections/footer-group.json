@@ -1,0 +1,132 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "name": "t:sections.footer.name",
+  "type": "footer",
+  "sections": {
+    "footer": {
+      "type": "footer",
+      "blocks": {
+        "platform_tGTAdA": {
+          "type": "platform",
+          "settings": {
+            "image": "shopify://shop_images/Image_h-full.png"
+          }
+        },
+        "platform_P3irTY": {
+          "type": "platform",
+          "settings": {
+            "image": "shopify://shop_images/fk_footer_png.png"
+          }
+        },
+        "platform_cLqy9p": {
+          "type": "platform",
+          "settings": {
+            "image": "shopify://shop_images/eternz_logo_footer.png"
+          }
+        },
+        "payment_j4fpd8": {
+          "type": "payment",
+          "settings": {
+            "image": "shopify://shop_images/upi_logo.png"
+          }
+        },
+        "payment_PUm4VF": {
+          "type": "payment",
+          "settings": {
+            "image": "shopify://shop_images/mastercard_png.png"
+          }
+        },
+        "payment_fjegcN": {
+          "type": "payment",
+          "settings": {
+            "image": "shopify://shop_images/visa_png.png"
+          }
+        },
+        "payment_JjDRLj": {
+          "type": "payment",
+          "settings": {
+            "image": "shopify://shop_images/rupay_png.png"
+          }
+        },
+        "payment_3GdygG": {
+          "type": "payment",
+          "settings": {
+            "image": "shopify://shop_images/diners_png.svg"
+          }
+        },
+        "payment_9PQ997": {
+          "type": "payment",
+          "settings": {
+            "image": "shopify://shop_images/net_banking_png.webp"
+          }
+        },
+        "payment_8Uew4B": {
+          "type": "payment",
+          "settings": {
+            "image": "shopify://shop_images/cod_png.webp"
+          }
+        },
+        "link_list_Mfht8K": {
+          "type": "link_list",
+          "settings": {
+            "heading": "Policies",
+            "menu": "footer-policies"
+          }
+        },
+        "link_list_URgP36": {
+          "type": "link_list",
+          "settings": {
+            "heading": "Quick links",
+            "menu": "header_menu_3"
+          }
+        },
+        "brand_information_7xcQqn": {
+          "type": "brand_information",
+          "settings": {
+            "show_social": true
+          }
+        }
+      },
+      "block_order": [
+        "platform_tGTAdA",
+        "platform_P3irTY",
+        "platform_cLqy9p",
+        "payment_j4fpd8",
+        "payment_PUm4VF",
+        "payment_fjegcN",
+        "payment_JjDRLj",
+        "payment_3GdygG",
+        "payment_9PQ997",
+        "payment_8Uew4B",
+        "link_list_Mfht8K",
+        "link_list_URgP36",
+        "brand_information_7xcQqn"
+      ],
+      "settings": {
+        "color_scheme": "scheme-a0833cff-1252-4aa2-8751-2f7cf27edbb0",
+        "newsletter_enable": false,
+        "newsletter_heading": "Subscribe to our emails",
+        "enable_follow_on_shop": false,
+        "show_social": false,
+        "enable_country_selector": false,
+        "enable_language_selector": false,
+        "payment_enable": true,
+        "show_policy": false,
+        "margin_top": 0,
+        "padding_top": 36,
+        "padding_bottom": 0
+      }
+    }
+  },
+  "order": [
+    "footer"
+  ]
+}

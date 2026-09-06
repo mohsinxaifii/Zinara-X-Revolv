@@ -1,0 +1,255 @@
+<div class="section-{{ section.id }}">
+  <div class="page-width">
+    <p class="trendsetters-section_heading">{{ section.settings.section_heading }}</p>
+    <div class="swiper trend-carousel-{{ section.id }}">
+      <div class="swiper-wrapper">
+        {% for block in section.blocks %}
+          <div class="swiper-slide" {{ block.shopify_attributes }}>
+            <a href="{{ block.settings.url }}">
+              <img src="{{ block.settings.image | image_url: width: 800 }}">
+              <div class="carousel-label">
+                {{ block.settings.text }}
+              </div>
+            </a>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="swiper-pagination trend-pagination-{{ section.id }}"></div>
+  </div>
+</div>
+{% stylesheet %}
+    .trendsetters-section_heading{
+      font-weight: 400;
+      color: #000;
+      font-size: 2rem;
+      text-align: center;
+      margin: 0 0 25px;
+      font-family: var(--font-heading-family);
+    }
+              .swiper {
+                overflow: visible;
+              }
+
+              .swiper-wrapper {
+                align-items: center;
+              }
+        .trend-pagination-{{ section.id }} {
+          margin-top: 24px;
+          display: flex;
+          justify-content: center;
+        }
+              .swiper-slide {
+                height: auto;
+              }
+                .section-{{ section.id }} {
+                  padding: 60px 0;
+                  background: #f4f4f4;
+                }
+
+                .swiper {
+                  overflow: visible;
+                }
+
+          .swiper-slide {
+            transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+                        opacity 0.5s ease,
+                        filter 0.5s ease;
+
+            opacity: 0.35;
+            transform: scale(0.8) !important;
+            filter: blur(1px);
+          }
+
+          /* ACTIVE */
+          .swiper-slide-active {
+            opacity: 1;
+            transform: scale(1) !important;
+            filter: blur(0);
+            z-index: 2;
+          }
+
+          /* SIDE */
+          .swiper-slide-prev,
+          .swiper-slide-next {
+            opacity: 0.6;
+            transform: scale(0.9) !important;
+            filter: blur(0.5px);
+            z-index: 1;
+          }
+
+                .swiper-slide {
+                  position: relative;
+                  aspect-ratio: 3 / 4;
+                  overflow: hidden;
+                }
+
+                .swiper-slide img {
+                  width: 100%;
+                  height: 100%;
+                  display: block;
+                  object-fit: cover;
+                  object-position: center;
+                }
+
+                .carousel-label {
+                  position: absolute;
+                  bottom: 12px;
+                  left: 12px;
+                  background: rgba(0,0,0,0.6);
+                  color: #fff;
+                  font-size: 12px;
+                  padding: 6px 10px;
+                  border-radius: 4px;
+                }
+
+                /* dots */
+                .swiper-pagination {
+                  margin-top: 20px;
+                  position: relative;
+                  position: unset !important;
+                }
+
+      .swiper-pagination-bullet {
+        width: 8px;
+        height: 8px;
+        background: #bbb;
+        border-radius: 50px;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        opacity: 1;
+        margin: 0 3px !important;
+        display: inline-block;
+        flex-shrink: 0;
+      }
+
+      .swiper-pagination-bullet-active {
+        width: 30px !important;
+        background: #D1D5DC !important;
+        border-radius: 50px !important;
+      }
+
+      .swiper-pagination-bullet-active::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        width: 0%;
+        background: #1A1A1A;
+        animation: dotProgress 1.8s linear forwards;
+      }
+      .trend-pagination-{{ section.id }} {
+        margin-top: 24px;
+        display: flex !important;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        position: relative;
+        z-index: 5;
+      }
+            @keyframes dotProgress {
+              from { width: 0%; }
+              to { width: 100%; }
+            }
+            @media (max-width: 767px) {
+  .trendsetters-section_heading {
+      margin: 30px 0 15px;
+  }
+
+  }
+{% endstylesheet %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script>
+  (function () {
+    const wrapper = document.querySelector('.trend-carousel-{{ section.id }} .swiper-wrapper');
+    const paginationEl = document.querySelector('.trend-pagination-{{ section.id }}');
+    const origSlides = Array.from(wrapper.children);
+    const slideCount = origSlides.length;
+
+    // Pre-fill so Swiper has enough slides to loop smoothly (min 12)
+    const copies = Math.ceil(12 / slideCount);
+    for (let i = 0; i < copies; i++) {
+      origSlides.forEach(s => wrapper.appendChild(s.cloneNode(true)));
+    }
+
+    // Build pagination: exactly slideCount dots, active in centre
+    for (let i = 0; i < slideCount; i++) {
+      const dot = document.createElement('span');
+      dot.className = 'swiper-pagination-bullet' + (i === 0 ? ' swiper-pagination-bullet-active' : '');
+      paginationEl.appendChild(dot);
+    }
+
+    function setActiveDot(realIdx) {
+      paginationEl.querySelectorAll('.swiper-pagination-bullet').forEach((dot, i) => {
+        const isActive = i === realIdx;
+        dot.classList.toggle('swiper-pagination-bullet-active', isActive);
+        if (isActive) {
+          dot.style.animation = 'none';
+          dot.offsetHeight;
+          dot.style.animation = null;
+        }
+      });
+    }
+
+    new Swiper('.trend-carousel-{{ section.id }}', {
+      loop: true,
+      centeredSlides: true,
+      autoplay: { delay: 1800, disableOnInteraction: false },
+      speed: 400,
+      slidesPerView: 5,
+      spaceBetween: 20,
+      breakpoints: {
+        0: { slidesPerView: 1.6, spaceBetween: 6 },
+        768: { slidesPerView: 5, spaceBetween: 20 },
+      },
+      on: {
+        slideChange: function () {
+          setActiveDot(this.realIndex % slideCount);
+        },
+      },
+    });
+  })();
+</script>
+{% schema %}
+{
+  "name": "Trendsetters Carousel",
+  "settings": [
+    {
+      "type": "text",
+      "id": "section_heading",
+      "label": "Section Heading",
+      "default": "Hear from trendsetters"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "Slide",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Label",
+          "default": "Daily Wear"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Trendsetters Carousel"
+    }
+  ]
+}
+{% endschema %}

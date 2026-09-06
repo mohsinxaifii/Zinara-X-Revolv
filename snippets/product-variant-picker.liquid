@@ -1,0 +1,285 @@
+{% comment %}
+  Renders product variant-picker
+
+  Accepts:
+  - product: {Object} product object.
+  - block: {Object} passing the block information.
+  - product_form_id: {String} Id of the product form to which the variant picker is associated.
+  Usage:
+  {% render 'product-variant-picker', product: product, block: block, product_form_id: product_form_id %}
+{% endcomment %}
+{%- unless product.has_only_default_variant -%}
+  <variant-selects
+    id="variant-selects-{{ section.id }}"
+    data-section="{{ section.id }}"
+    {{ block.shopify_attributes }}
+  >
+    {%- for option in product.options_with_values -%}
+      {%- liquid
+        assign swatch_count = option.values | map: 'swatch' | compact | size
+        assign picker_type = block.settings.picker_type
+        assign option_name_normalized = option.name | downcase | strip
+
+        if option_name_normalized == 'size'
+          assign picker_type = 'button'
+        elsif swatch_count > 0 and block.settings.swatch_shape != 'none'
+          if block.settings.picker_type == 'dropdown'
+            assign picker_type = 'swatch_dropdown'
+          else
+            assign picker_type = 'swatch'
+          endif
+        endif
+      -%}
+      {%- if picker_type == 'swatch' -%}
+        <fieldset class="js product-form__input product-form__input--swatch">
+          <legend class="form__label">
+            {{ option.name }}:
+            <span data-selected-value>
+              {{- option.selected_value -}}
+            </span>
+          </legend>
+          {% render 'product-variant-options',
+            product: product,
+            option: option,
+            block: block,
+            picker_type: picker_type
+          %}
+        </fieldset>
+      {%- elsif picker_type == 'button' -%}
+        <fieldset class="js product-form__input product-form__input--pill">
+          <legend class="form__label">
+            {{ option.name }}
+            {%- assign normalized_option_name = option.name | downcase | strip -%}
+            {%- if normalized_option_name == 'size' -%}
+              <button type="button" class="size-chart-btn" aria-label="Open size chart">Size Chart</button>
+            {%- endif -%}
+          </legend>
+          {% render 'product-variant-options',
+            product: product,
+            option: option,
+            block: block,
+            picker_type: picker_type
+          %}
+        </fieldset>
+      {%- else -%}
+        <div class="product-form__input product-form__input--dropdown">
+          {% comment %}
+            <label class="form__label" for="Option-{{ section.id }}-{{ forloop.index0 }}">
+              {{ option.name }}
+            </label>
+          {% endcomment %}
+          {% assign option_name_normalized = option.name | downcase | strip %}
+          {% if option_name_normalized == 'choose your color' %}
+            <fieldset class="js product-form__input product-form__input--swatch">
+              <legend class="variant-dropdown-option-name-span">
+                {{ option.name }}:
+                {% comment %}
+                  <span data-selected-value>
+                    {{- option.selected_value -}}
+                  </span>
+                {% endcomment %}
+              </legend>
+              <div class="swatch-label-container">
+                {% for value in option.values %}
+                  {% assign is_selected = false %}
+                  {% if value == option.selected_value %}
+                    {% assign is_selected = true %}
+                  {% endif %}
+
+                  {%- assign value_index = forloop.index0 -%}
+                  {%- assign swatch_data = option.values[value_index].swatch -%}
+                  {%- capture input_id -%}
+                    {{ section.id }}-{{ option.position }}-{{ forloop.index0 -}}
+                  {%- endcapture -%}
+                  {%- liquid
+                    assign option_disabled = true
+                    if value.available
+                      assign option_disabled = false
+                    endif
+                  -%}
+                  {%- capture input_dataset -%}
+                    data-product-url="{{ value.product_url }}"
+                    data-option-value-id="{{ value.id }}"
+                  {%- endcapture -%}
+
+                  <label class="swatch-label{% if is_selected %} selected{% endif %}">
+                    <input
+                      type="radio"
+                      id="{{ input_id }}"
+                      name="options[{{ option.name | escape }}]"
+                      value="{{ value | escape }}"
+                      form="{{ product_form_id }}"
+                      {% if is_selected %}
+                        checked
+                      {% endif %}
+                      {% if option_disabled %}
+                        class="disabled"
+                      {% endif %}
+                      {{ input_dataset }}
+                    >
+                    <span data-selected-value class="dropdown-swatch">
+                      {% render 'swatch', swatch: swatch_data, shape: block.settings.swatch_shape %}
+                    </span>
+                  </label>
+                {% endfor %}
+              </div>
+            </fieldset>
+          {% else %}
+            <div class="select">
+              <span class="variant-dropdown-option-name-span"> {{ option.name }}: </span>
+              {% comment %}
+                {%- if picker_type == 'swatch_dropdown' -%}
+                  <span
+                    data-selected-value
+                    class="dropdown-swatch"
+                  >
+                    {% render 'swatch', swatch: option.selected_value.swatch, shape: block.settings.swatch_shape %}
+                  </span>
+                {%- endif -%}
+              {% endcomment %}
+              <select
+                id="Option-{{ section.id }}-{{ forloop.index0 }}"
+                class="select__select"
+                name="options[{{ option.name | escape }}]"
+                form="{{ product_form_id }}"
+              >
+                {% render 'product-variant-options',
+                  product: product,
+                  option: option,
+                  block: block,
+                  picker_type: picker_type
+                %}
+              </select>
+              <span class="svg-wrapper">
+                {% comment %} {{- 'icon-caret.svg' | inline_asset_content -}} {% endcomment %}
+                <img
+                  src="https://cdn.shopify.com/s/files/1/0661/8336/4792/files/Vector_33.png?v=1754303698"
+                  alt="Dropdown arrow"
+                >
+              </span>
+            </div>
+          {% endif %}
+        </div>
+      {%- endif -%}
+    {%- endfor -%}
+    <script type="application/json" data-selected-variant>
+      {{ product.selected_or_first_available_variant | json }}
+    </script>
+  </variant-selects>
+  {% comment %}
+    <div class="sizing-guide">
+      <button id="openPopup">Sizing Guide</button>
+    </div>
+  {% endcomment %}
+
+  <div class="popup" id="popup">
+    <button class="close-btn" id="closePopup">&times;</button>
+    <img
+      src="https://cdn.shopify.com/s/files/1/0661/8336/4792/files/Zinara_Ring_Size_Guide_removed_page-0001.jpg?v=1738784512"
+      alt="Sizing Guide Image"
+    >
+  </div>
+  <script>
+    (() => {
+      console.log('[SizeChart] script initialized');
+      const bindSizeChart = () => {
+        const sizeChartBottomSheet = document.getElementById('sizeChartBottomSheet');
+        const closeSizeChartBtn = document.getElementById('closeSizeChartBtn');
+        const sizeChartOverlay = document.getElementById('sizeChartOverlay');
+
+        console.log('[SizeChart] elements', {
+          hasBottomSheet: !!sizeChartBottomSheet,
+          hasCloseButton: !!closeSizeChartBtn,
+          hasOverlay: !!sizeChartOverlay,
+        });
+
+        if (!sizeChartBottomSheet || !sizeChartOverlay) {
+          return false;
+        }
+
+        // iOS-safe scroll lock helpers
+        const lockScroll = () => {
+          const scrollY = window.scrollY;
+          document.body.style.position = 'fixed';
+          document.body.style.top = `-${scrollY}px`;
+          document.body.style.width = '100%';
+          document.body.dataset.scrollY = scrollY;
+        };
+        const unlockScroll = () => {
+          const scrollY = parseInt(document.body.dataset.scrollY || '0', 10);
+          document.body.style.position = '';
+          document.body.style.top = '';
+          document.body.style.width = '';
+          window.scrollTo(0, scrollY);
+        };
+
+        if (!window.__zinaraSizeChartOpenBound) {
+          document.addEventListener('click', (e) => {
+            const openBtn = e.target.closest('.size-chart-btn');
+            if (!openBtn) return;
+            e.preventDefault();
+            // Clear the initial inline hidden styles so the .active rules apply
+            sizeChartBottomSheet.style.transform = '';
+            sizeChartOverlay.style.opacity = '';
+            sizeChartOverlay.style.pointerEvents = '';
+            sizeChartBottomSheet.classList.add('active');
+            sizeChartOverlay.classList.add('active');
+            lockScroll();
+          });
+          // Prevent touch-scroll bleed-through on iOS overlay
+          sizeChartOverlay.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
+          window.__zinaraSizeChartOpenBound = true;
+        }
+
+        if (closeSizeChartBtn && !window.__zinaraSizeChartCloseBound) {
+          const closeSheet = () => {
+            sizeChartBottomSheet.classList.remove('active');
+            sizeChartOverlay.classList.remove('active');
+            unlockScroll();
+          };
+          closeSizeChartBtn.addEventListener('click', closeSheet);
+          sizeChartOverlay.addEventListener('click', closeSheet);
+          window.__zinaraSizeChartCloseBound = true;
+        } else if (!closeSizeChartBtn) {
+          console.log('[SizeChart] close button not found');
+        }
+
+        return true;
+      };
+
+      if (!bindSizeChart()) {
+        console.log('[SizeChart] waiting for bottom sheet via MutationObserver');
+        const observer = new MutationObserver(() => {
+          if (bindSizeChart()) {
+            console.log('[SizeChart] bottom sheet detected, observer disconnected');
+            observer.disconnect();
+          }
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
+      }
+
+      const openPopup = document.getElementById('openPopup');
+      const closePopup = document.getElementById('closePopup');
+      const popup = document.getElementById('popup');
+
+      if (openPopup && closePopup && popup) {
+        openPopup.addEventListener('click', () => {
+          popup.style.display = 'flex';
+          // document.body.classList.add('no-scroll');
+        });
+
+        closePopup.addEventListener('click', () => {
+          popup.style.display = 'none';
+          // document.body.classList.remove('no-scroll');
+        });
+
+        popup.addEventListener('click', (e) => {
+          if (e.target === popup) {
+            popup.style.display = 'none';
+            // document.body.classList.remove('no-scroll');
+          }
+        });
+      }
+    })();
+  </script>
+{%- endunless -%}

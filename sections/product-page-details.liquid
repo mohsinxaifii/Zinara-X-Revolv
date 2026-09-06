@@ -1,0 +1,114 @@
+{% if product.selected_or_first_available_variant.metafields.content.product_details_list_1_json != null %}
+  <div class="product-page-details-container">
+    <h2 class="page-width section-heading">{{ section.settings.heading }}</h2>
+    <div class="page-width product-page-details-parent">
+      <div class="product-page-details-parent-child product-page-details-parent-child_1">
+        {% for list_1 in product.selected_or_first_available_variant.metafields.content.product_details_list_1_json.value %}
+          <div class="product-page-details-list-container">
+            <p class="product-page-details-list_heading">{{ list_1.heading }}</p>
+            {% for list_item_1 in list_1.items %}
+              <div class="product-page-details-list-parent">
+                <p class="product-page-details-list_title">{{ list_item_1.label }}</p>
+                <p class="product-page-details-list_content">{{ list_item_1.value }}</p>
+              </div>
+            {% endfor %}
+          </div>
+        {% endfor %}
+      </div>
+      <div class="product-page-details-parent-child product-page-details-parent-child_2">
+        {% for list_2 in product.selected_or_first_available_variant.metafields.content.product_details_list_2_json.value %}
+          <div class="product-page-details-list-container">
+            <p class="product-page-details-list_heading">{{ list_2.heading }}</p>
+            {% for list_item_2 in list_2.items %}
+              <div class="product-page-details-list-parent">
+                <p class="product-page-details-list_title">{{ list_item_2.label }}</p>
+                <p class="product-page-details-list_content">{{ list_item_2.value }}</p>
+              </div>
+            {% endfor %}
+          </div>
+        {% endfor %}
+        {% comment %}
+          <div class="product_details_stone_info_tabs">
+            <div class="product_details_stone_info_tab">
+              <img src="https://cdn.shopify.com/s/files/1/0661/8336/4792/files/Vector_19.png?v=1739429819">
+              <p>Cut</p>
+            </div>
+            <div class="product_details_stone_info_tab">
+              <img src="https://cdn.shopify.com/s/files/1/0661/8336/4792/files/Vector_19.png?v=1739429819">
+              <p>Color/Clarity</p>
+            </div>
+          </div>
+        {% endcomment %}
+      </div>
+      <div class="product-page-details-parent-child product-page-details-parent-child_2">
+        {% for list_3 in product.selected_or_first_available_variant.metafields.content.product_details_list_3_json.value %}
+          <div class="product-page-details-list-container">
+            <p class="product-page-details-list_heading">{{ list_3.heading }}</p>
+            {% for list_item_3 in list_3.items %}
+              <div class="product-page-details-list-parent">
+                <p class="product-page-details-list_title">{{ list_item_3.label }}</p>
+                <p class="product-page-details-list_content">{{ list_item_3.value }}</p>
+              </div>
+            {% endfor %}
+          </div>
+        {% endfor %}
+        {% comment %}
+          <div class="product_details_stone_info_tabs">
+            <div class="product_details_stone_info_tab">
+              <img src="https://cdn.shopify.com/s/files/1/0661/8336/4792/files/Vector_19.png?v=1739429819">
+              <p>Cut</p>
+            </div>
+            <div class="product_details_stone_info_tab">
+              <img src="https://cdn.shopify.com/s/files/1/0661/8336/4792/files/Vector_19.png?v=1739429819">
+              <p>Color/Clarity</p>
+            </div>
+          </div>
+        {% endcomment %}
+      </div>
+      <div class="product-page-details-parent-child product-page-details-parent-child_2">
+        {% for list_4 in product.selected_or_first_available_variant.metafields.content.product_details_list_4_json.value %}
+          <div class="product-page-details-list-container">
+            <p class="product-page-details-list_heading">{{ list_4.heading }}</p>
+            {% for list_item_4 in list_4.items %}
+              <div class="product-page-details-list-parent">
+                <p class="product-page-details-list_title">{{ list_item_4.label }}</p>
+                <p class="product-page-details-list_content">{{ list_item_4.value }}</p>
+              </div>
+            {% endfor %}
+          </div>
+        {% endfor %}
+        {% comment %}
+          <div class="product_details_stone_info_tabs">
+            <div class="product_details_stone_info_tab">
+              <img src="https://cdn.shopify.com/s/files/1/0661/8336/4792/files/Vector_19.png?v=1739429819">
+              <p>Cut</p>
+            </div>
+            <div class="product_details_stone_info_tab">
+              <img src="https://cdn.shopify.com/s/files/1/0661/8336/4792/files/Vector_19.png?v=1739429819">
+              <p>Color/Clarity</p>
+            </div>
+          </div>
+        {% endcomment %}
+      </div>
+    </div>
+  </div>
+{% endif %}
+{% schema %}
+{
+  "name": "Product Page Details",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Section Heading",
+      "default": "Product Details"
+    }
+  ],
+  "blocks": [],
+  "presets": [
+    {
+      "name": "Product Page Details"
+    }
+  ]
+}
+{% endschema %}

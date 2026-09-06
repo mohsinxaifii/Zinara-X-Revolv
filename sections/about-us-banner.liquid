@@ -1,0 +1,95 @@
+<section class="about-us-top-banner inner-banner">
+  <img class="desktop-image" src="{{ section.settings.bg_image |  image_url  }}">
+  <img class="mobile-image" src="{{ section.settings.bg_image_mobile |  image_url  }}">
+  <div class="container h-100 page-width">
+    <div class="hero-text">
+      <h1
+        style="
+          text-align: center !important;
+          margin-top: 15px !important;
+          margin-bottom: 10px !important;
+          font-family: "Montserrat", sans-serif;
+        "
+        class="section-heading"
+      >
+        {{ section.settings.heading }}
+      </h1>
+      <p>{{ section.settings.subheading }}</p>
+    </div>
+  </div>
+</section>
+<style>
+  .about-us-top-banner {
+    position: relative !important;
+    background: transparent;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    overflow: hidden;
+    width: 100%;
+  }
+
+  .about-us-top-banner img {
+    height: auto;
+    width: 100%;
+  }
+  .desktop-image {
+    display: flex;
+  }
+  .mobile-image {
+    display: none;
+  }
+  .about-us-top-banner p {
+    font-size: 1.4rem;
+    font-family: "Montserrat", sans-serif;
+    font-weight: 500;
+    margin: 0;
+    text-align: center;
+  }
+  @media (max-width: 756px) {
+    .about-us-top-banner .Banner-heading,
+    .about-us-top-banner p {
+      text-align: center;
+      width: 100%;
+    }
+    .desktop-image {
+      display: none;
+    }
+    .mobile-image {
+      display: flex;
+    }
+  }
+</style>
+{% schema %}
+{
+  "name": "About Us Banner",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "default": "Our Story",
+      "label": "Heading"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "default": "STUNNING, STYLISH AND WITHIN REACH",
+      "label": "subheading"
+    },
+    {
+      "type": "image_picker",
+      "id": "bg_image",
+      "label": "Background Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "bg_image_mobile",
+      "label": "Background Image Mobile"
+    }
+  ],
+  "presets": [
+    {
+      "name": "About Us Banner"
+    }
+  ]
+}
+{% endschema %}

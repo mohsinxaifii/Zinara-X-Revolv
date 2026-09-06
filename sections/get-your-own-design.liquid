@@ -1,0 +1,223 @@
+<div class="page-width own-design-container">
+  <div class="own-design-header-container">
+    <div>
+      <img src="https://cdn.shopify.com/s/files/1/0661/8336/4792/files/Expand_Arrow_2.png?v=1745235024">
+      <p>Get your Own Design</p>
+    </div>
+    <button>WhatsApp Us</button>
+  </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const images = document.querySelectorAll('.own-design-header-container img');
+      const button = document.querySelector('.own-design-header-container button');
+
+      if (images.length > 0) {
+        images[0].addEventListener('click', () => {
+          window.history.back();
+        });
+
+        if (button) {
+          button.addEventListener('click', () => {
+            window.open('https://wa.me/918851812814', '_blank');
+          });
+        }
+      }
+    });
+  </script>
+
+  <h2 class="section-heading">{{ section.settings.heading }}</h2>
+  <div class="own-design-images-container">
+    {% for block in section.blocks %}
+      <div class="own-design-image">
+        <img src="{{ block.settings.image | img_url: 'master' }}">
+        <div>
+          <h3>{{ block.settings.heading }}</h3>
+          <p>{{ block.settings.description }}</p>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+  <h2 class="section-heading">{{ section.settings.heading_2 }}</h2>
+  {{ section.settings.description }}
+</div>
+<style>
+  .own-design-header-container {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    align-items: center;
+    position: sticky;
+    top: 0px;
+    background: #fff;
+    padding-bottom: 20px;
+    padding-top: 20px;
+  }
+  .own-design-header-container div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: fit-content;
+  }
+  .own-design-header-container img {
+    width: 25px;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    cursor: pointer;
+  }
+  .own-design-header-container p {
+    font-family: 'Montserrat', sans-serif;
+    color: #171717;
+    font-size: 3rem;
+    margin: 0 0 0 15px;
+    font-weight: 500;
+  }
+  .own-design-header-container button {
+    border: none;
+    background: #712242;
+    color: #fff;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 400;
+    padding: 10px 50px;
+    font-size: 2rem;
+  }
+  .own-design-images-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 70px;
+  }
+  .own-design-image {
+    width: 32%;
+  }
+  .own-design-image img {
+    width: 100%;
+    border-radius: 20px 0 20px;
+  }
+  .own-design-image h3 {
+    text-align: center;
+    font-size: 2rem;
+    margin: 13px 0 0;
+    font-family: 'Montserrat', sans-serif;
+  }
+  .own-design-image p {
+    text-align: center;
+    font-size: 1.6rem;
+    margin: 7px 0 0;
+    line-height: 2.3rem;
+    color: #121212;
+    font-weight: 400;
+  }
+  .own-design-container ul li {
+    font-size: 2rem;
+    margin: 25px 0;
+    line-height: 2.7rem;
+    color: #121212;
+    font-weight: 400;
+  }
+  @media (max-width: 756px) {
+    .own-design-images-container {
+      flex-direction: column;
+    }
+    .own-design-image {
+      width: 100%;
+      margin-bottom: 25px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .own-design-image img {
+      width: 29%;
+      height: auto;
+    }
+    .own-design-image h3 {
+      text-align: left;
+      font-size: 1.8rem;
+      margin: 0;
+    }
+    .own-design-image p {
+      font-size: 1.4rem;
+      text-align: left;
+      line-height: 2rem;
+    }
+    .own-design-images-container {
+      margin-bottom: 30px;
+    }
+    .own-design-container ul li {
+      margin: 5px 0;
+      font-size: 1.4rem;
+    }
+    .own-design-header-container div {
+      display: none;
+    }
+    .own-design-header-container {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      top: unset;
+      margin: 0;
+      padding: 20px;
+      background: #f9f7fa;
+      z-index: 2;
+    }
+    .own-design-header-container button {
+      width: 100%;
+    }
+    .own-design-container {
+      margin-top: 40px;
+    }
+  }
+</style>
+{% schema %}
+{
+  "name": "Own Design Content",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Section Heading",
+      "default": "How it works"
+    },
+    {
+      "type": "text",
+      "id": "heading_2",
+      "label": "Section Heading 2",
+      "default": "Pick your own:"
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Pick your Own:"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "image-block-2",
+      "name": "Image Block",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading"
+        },
+        {
+          "type": "text",
+          "id": "description",
+          "label": "Description"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Own Design Content"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,65 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "main-login",
+      "disabled": true,
+      "settings": {
+        "enable_shop_login_button": false,
+        "padding_top": 36,
+        "padding_bottom": 36
+      }
+    },
+    "rich_text_HzFPPP": {
+      "type": "rich-text",
+      "blocks": {
+        "heading_KB8JkY": {
+          "type": "heading",
+          "settings": {
+            "heading": "Loading... Please Wait",
+            "heading_size": "h1"
+          }
+        },
+        "text_jYDpUM": {
+          "type": "text",
+          "settings": {
+            "text": "<p>If the login window doesn't appear within 10 seconds, please go back & try again.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "heading_KB8JkY",
+        "text_jYDpUM"
+      ],
+      "name": "t:sections.rich-text.presets.name",
+      "settings": {
+        "desktop_content_position": "center",
+        "content_alignment": "center",
+        "color_scheme": "",
+        "full_width": true,
+        "padding_top": 40,
+        "padding_bottom": 52
+      }
+    },
+    "1745686204a93b1406": {
+      "type": "apps",
+      "disabled": true,
+      "settings": {
+        "include_margins": true
+      }
+    }
+  },
+  "order": [
+    "main",
+    "rich_text_HzFPPP",
+    "1745686204a93b1406"
+  ]
+}

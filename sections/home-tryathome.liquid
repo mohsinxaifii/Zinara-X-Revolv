@@ -1,0 +1,128 @@
+<section class="home-try-at-home-section-container">
+  <div class="page-width home-try-at-home-section">
+    <div class="home-try-at-home-section-left">
+      <h2 class="section-heading">{{ section.settings.heading }}</h2>
+      <p>{{ section.settings['sub-heading'] }}</p>
+      <div>
+        <a href="{{section.settings.url-1}}">{{ section.settings['button-1'] }}</a>
+        <a href="{{section.settings.url-2}}">{{ section.settings['button-2'] }}</a>
+      </div>
+    </div>
+    <div class="home-try-at-home-section-right">
+      <img src="{{ section.settings.image | img_url: 'master' }}" alt="Try at Home">
+    </div>
+  </div>
+</section>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const links = document.querySelectorAll('.home-try-at-home-section-left a');
+
+    links.forEach((link) => {
+      link.addEventListener('click', function (e) {
+        const linkText = link.innerText.trim().toLowerCase();
+        const sourceUrl = window.location.href;
+        const redirectUrl = link.href || 'Unknown';
+        const pageTitle = document.title;
+
+        // Customer info from global window object
+        const customer = window.customer || {};
+        const address = customer.default_address || {};
+
+        let eventName = '';
+        let source = '';
+
+        if (linkText.includes('try at home')) {
+          eventName = 'try_at_home';
+          source = 'Home Try at Home Section';
+        } else if (linkText.includes('start designing')) {
+          eventName = 'get_own_design';
+          source = 'Home Own Design Section';
+        }
+
+        if (eventName) {
+          e.preventDefault();
+
+          const eventData = {
+            source_url: sourceUrl,
+            redirect_url: redirectUrl,
+            page_title: pageTitle,
+            source: source,
+            customer_id: customer.id || null,
+            customer_email: customer.email || null,
+            customer_name: `${customer.first_name || ''} ${customer.last_name || ''}`.trim(),
+            customer_phone: customer.phone || null,
+            customer_address: `${address.address1 || ''}, ${address.city || ''}, ${address.province || ''}, ${
+              address.zip || ''
+            }, ${address.country || ''}`.trim(),
+          };
+
+          gtag('event', eventName, eventData);
+
+          // ✅ Meta Pixel: send same custom event
+          if (typeof fbq === 'function') {
+            fbq('trackCustom', eventName, eventData);
+          }
+
+          console.log(`${eventName} event sent with customer data:`, eventData);
+
+          setTimeout(() => {
+            window.location.href = redirectUrl;
+          }, 300);
+        }
+      });
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Home Try at Home",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Section Heading",
+      "default": "Want to see designs personally?"
+    },
+    {
+      "type": "text",
+      "id": "sub-heading",
+      "label": "Sub Heading",
+      "default": "Get designs to try at home or schedule a video call"
+    },
+    {
+      "type": "text",
+      "id": "button-1",
+      "label": "Button 1 Text",
+      "default": "Try at Home"
+    },
+    {
+      "type": "url",
+      "id": "url-1",
+      "label": "Button 1 URL"
+    },
+    {
+      "type": "text",
+      "id": "button-2",
+      "label": "Button 2 Text",
+      "default": "Video Call"
+    },
+    {
+      "type": "url",
+      "id": "url-2",
+      "label": "Button 2 URL"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Home Try at Home",
+      "category": "Custom"
+    }
+  ]
+}
+{% endschema %}

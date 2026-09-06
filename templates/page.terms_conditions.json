@@ -1,0 +1,101 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "padding_top": 28,
+        "padding_bottom": 28
+      }
+    },
+    "collapsible_content_AEkczY": {
+      "type": "collapsible-content",
+      "blocks": {
+        "collapsible_row_xPW3Pp": {
+          "type": "collapsible_row",
+          "settings": {
+            "heading": "Collapsible row",
+            "icon": "none",
+            "row_content": "<p>dfvbxvxcvxc</p>",
+            "page": ""
+          }
+        }
+      },
+      "block_order": [
+        "collapsible_row_xPW3Pp"
+      ],
+      "disabled": true,
+      "settings": {
+        "caption": "",
+        "heading": "Our Policy",
+        "heading_size": "h1",
+        "heading_alignment": "center",
+        "layout": "none",
+        "color_scheme": "",
+        "container_color_scheme": "",
+        "open_first_collapsible_row": false,
+        "image_ratio": "adapt",
+        "desktop_layout": "image_second",
+        "padding_top": 36,
+        "padding_bottom": 36
+      }
+    },
+    "rich_text_6RjKWV": {
+      "type": "rich-text",
+      "blocks": {
+        "heading_FirREH": {
+          "type": "heading",
+          "settings": {
+            "heading": "Terms and Conditions",
+            "heading_size": "h1"
+          }
+        },
+        "text_mRLx9T": {
+          "type": "text",
+          "settings": {
+            "text": "<p><strong>ZINARA Terms and Conditions</strong></p><p>Last Updated: 22 May 2024</p><h4>Welcome to ZINARA.<br/>This website, <a href=\"http://www.zinara.in/\"><span style=\"text-decoration:underline\">www.zinara.in</span></a> (“Zinara” or “website” or “company” or “our” or “we” or “us”) is the shopping website owned and operated by Inditren Technologies Private Limited.<br/>These Terms and Conditions govern your experience with our website and the purchase of our exquisite lab-grown diamond jewelry. By engaging with our website, you agree to abide by these Terms and Conditions.<br/><br/><strong>1. General</strong></h4><p>1.1. Acceptance of Terms : Your access and use of this website signify your acceptance of these Terms and Conditions. If you do not agree with any part of these terms, please refrain from using our website.</p><p>1.2. Modification of Terms : ZINARA reserves the right to modify or update these Terms and Conditions at any time. Any changes will be effective immediately upon posting on the website.</p><h4><strong>2. Products and Services</strong></h4><p>2.1. Exquisite Designs : Our lab-grown diamond jewelry designs are meticulously crafted to capture the essence of elegance and sophistication. While we strive for accuracy, product descriptions and images may vary slightly from the actual products.</p><p>2.2. Made to order articles : The gold weight indicated on items from what is stated in the product description. However, any variance in the product's weight will be either charged or refunded to the customer accordingly.<br/>For instance, if a ring is displayed on the website with an estimated weight of 3.1 grams at Size 12, during production, the actual weight may be 3.6 grams. In such a case, the additional gold weight will be invoiced to the customer prior to shipping the product.<br/>Similarly, if a ring is showcased with an approximate weight of 3.3 grams at Size 12 on the website, but during production, the actual weight is 3.1 grams, the reduced gold weight will be reimbursed to the customer before shipping the product.</p><p><br/></p><h4><strong>3. Orders</strong></h4><p>3.1. Order Placement: Upon placing an order, you will receive an order confirmation email/SMS. Please note that this confirmation does not constitute acceptance of your order. ZINARA reserves the right to accept or decline any order at our discretion.</p><p>3.2. Secure Transactions: We employ industry-standard encryption technologies to ensure the security of your payment information. Your transactions are safe with us.</p><p>3.3. Shipping and Handling: We offer swift and reliable shipping services. Please refer to our <a href=\"https://zinara.in/pages/our-policy\" target=\"_blank\" title=\"Shipping Policy | Zinara\"><strong>Shipping Policy</strong></a> for detailed information on shipping options, costs, available regions and estimated delivery times.</p><h4><strong>4. Returns and Exchanges</strong></h4><p>4.1. Customer Satisfaction: Your satisfaction is our priority. If you are not completely satisfied with your purchase, you may return or exchange the item within 15 days of receipt, subject to our <a href=\"https://zinara.in/pages/our-policy\" target=\"_blank\" title=\"Return and Refund Policy | Zinara\"><strong>Return Policy</strong></a>.</p><p>4.2. Return Procedure: To initiate a return or exchange, please contact our customer service team. Items must be returned in their original packaging and condition, accompanied by the original purchase receipt.</p><h4><strong>5. Intellectual Property and Copyright</strong></h4><p>5.1. Unique Creations: ZINARA’s designs and brand identity including audio, visual and written content are protected by Indian and international copyright laws. Any unauthorized use or reproduction of our intellectual property is strictly prohibited.</p><p>5.2. Limited License: You are granted a limited, non-exclusive, and non-transferable license to access and use our website for personal, non-commercial purposes only.<br/><br/>5.3. Trademark : The trademarks and trade dress of ZINARA and its affiliates, including the ZINARA name, logo, and other graphics, are protected by trademark laws. Use of these without written permission is prohibited. Other trademarks on the site belong to their respective owners and may not be affiliated with us.</p><h4><strong>6. Privacy and Security</strong></h4><p>6.1. Data Protection: We are committed to protecting your privacy. Please review our <a href=\"https://zinara.in/pages/our-policy\" target=\"_blank\" title=\"Privacy Policy | Zinara\"><strong>Privacy Policy</strong></a> to understand how we collect, use, and safeguard your personal information.<br/><br/>6.2. No Confidentiality : Except for order-related information, we do not want confidential or proprietary information or trade secrets through this website. Any submissions will be considered non-confidential, granting us an irrevocable license to use, modify, reproduce, transmit, display, and distribute them for any purpose without compensation. We will not use your name unless required by law or with your permission.<br/><br/>6.3. Protecting your information : To protect your shopping experience with <a href=\"http://www.zinara.in/\"><span style=\"text-decoration:underline\">www.zinara.in</span></a> , we will fully prosecute any unauthorized or fraudulent transactions to the maximum extent permitted by law.</p><h4><strong>7. Disclaimer and Limitation of Liability</strong></h4><p>7.1. Quality Assurance: While we strive for excellence, ZINARA cannot guarantee that the website will be error-free or that any defects will be corrected promptly.</p><p>7.2. Liability Limitation: ZINARA shall not be liable for any indirect, incidental, special, or consequential damages arising out of or in connection with your use of our website or products. We provide this website and its content \"as is,\" without any warranties, expressed or implied. We and our affiliates, including directors, officers, employees, and agents, are not liable for any damages arising from the use of this site or linked sites.<br/><br/>7.3. Indemnity: You agree to indemnify and hold ZINARA harmless from any claims, losses, damages, liabilities, costs, and expenses, including reasonable attorneys' fees, arising out of or in connection with your use of the ZINARA website or violation of these Terms and Conditions.</p><h4><strong>8. Governing Law</strong></h4><p>8.1. Legal Framework: These Terms and Conditions are governed by the laws of the Government of India. Any disputes arising from these terms shall be subject to the exclusive jurisdiction of the courts in Delhi.</p><h4><strong>9. Contact Information</strong></h4><p>9.1. Customer Support: If you have any questions or concerns regarding these Terms and Conditions, please contact our customer support team at <strong>admin@zinara.in</strong></p>"
+          }
+        },
+        "button_tjCCch": {
+          "type": "button",
+          "settings": {
+            "button_label": "Button label",
+            "button_link": "",
+            "button_style_secondary": false,
+            "button_label_2": "",
+            "button_link_2": "",
+            "button_style_secondary_2": false
+          }
+        }
+      },
+      "block_order": [
+        "heading_FirREH",
+        "text_mRLx9T",
+        "button_tjCCch"
+      ],
+      "name": "t:sections.rich-text.presets.name",
+      "settings": {
+        "desktop_content_position": "center",
+        "content_alignment": "left",
+        "color_scheme": "",
+        "full_width": true,
+        "padding_top": 40,
+        "padding_bottom": 52
+      }
+    }
+  },
+  "order": [
+    "main",
+    "collapsible_content_AEkczY",
+    "rich_text_6RjKWV"
+  ]
+}

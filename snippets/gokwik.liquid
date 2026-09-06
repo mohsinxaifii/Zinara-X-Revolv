@@ -1,0 +1,1162 @@
+<style>
+/* ── GoKwik Button Decoration ──────────────────────────────────────── */
+.gk-btn-wrap{display:flex;flex-direction:column;width:100%;}
+.gk-banner{background:#22c55e;color:#fff;font-size:12px;font-weight:600;padding:5px 10px;text-align:center;border-radius:4px 4px 0 0;letter-spacing:.02em;}
+.gokwik-marge{display:flex!important;align-items:center!important;justify-content:center!important;}
+.gk-inner{display:inline-flex;align-items:center;justify-content:center;gap:10px;pointer-events:none;max-width:100%;}
+.gk-text-block {
+ display: inline-flex;
+ flex-direction: column;
+ align-items: center;
+ text-align: center;
+ min-width: 0;
+ line-height: 1.1;
+}
+
+.gk-btn-main {
+ line-height: 1.1;
+ font-size: 14px;
+}
+
+.cart__ctas .cart__checkout-button {
+  height: 45px;
+}
+.gk-sub-text {
+ font-size: 9px;
+ opacity: .8;
+ margin-top: 0;
+ line-height: 1;
+}
+
+.gk-pay-icons{display:inline-flex;align-items:center;gap:4px;flex-shrink:0;pointer-events:none;}
+.gk-pay-icons img{height:20px;width:auto;display:block;}
+.sr-brand-badge-container span.sr-powered-by{display:none!important;}
+</style>
+
+<script src="https://pdp.gokwik.co/merchant-integration/build/merchant.integration.js?v4" defer></script>
+
+<script>
+ window.gaTag = { ga4: "{{ settings.ga4Gokwik }}" }
+ window.merchantInfo = {
+   mid: "{{ settings.mid }}",
+   environment: "{{ settings.envType }}",
+   type: "merchantInfo",
+   storeId: "{{shop.id}}",
+   fbpixel: "{{settings.fbpixel}}",
+   snapchatPixels: "{{ settings.snapPixel }}",
+ }
+ var productFormSelector = '';
+ var cart = {{ cart | json }}
+ var templateName = '{{template.name}}'
+ window.gokwikIntlFlow = {{ settings.enableIntlFlow | json }};
+ window.gkBtnConfig = {
+   checkoutEnabled:       {{ settings.goEnable | json }},
+   checkoutSubText:       "{{ settings.checkoutSubText | escape }}",
+   checkoutEnableBanner:  {{ settings.checkoutEnableBanner | json }},
+   checkoutEnableLogo:    {{ settings.checkoutEnableLogo | json }},
+   buyNowEnabled:         {{ settings.goBuynowEnable | json }},
+   buyNowSubText:         "{{ settings.buyNowSubText | escape }}",
+   buyNowEnableBanner:    {{ settings.buyNowEnableBanner | json }},
+   buyNowEnableLogo:      {{ settings.buyNowEnableLogo | json }},
+ };
+</script>
+
+
+<script>
+(function () {
+
+ const UNIQUE_CLASS             = "gokwik-marge";
+ const EXTERNAL_CLASSES         = ["cf-occ-btn"];
+ const BUTTON_TYPES             = ["BUTTON", "A", "INPUT"];
+ const CHECKOUT_TEXT            = ["checkout", "placeorder"];
+ const BUYNOW_TEXT              = ["buynow", "buyitnow"];
+ const LOADER_TIME              = 6000;
+ window._gokwikLock             = false;
+
+ const EXTERNAL_CHECKOUT_SELECTORS = [
+   '.shiprocket-headless[data-type="cart"]',
+   '.shiprocket-headless[data-type="mini-cart"]',
+   '.fastrr-checkout[data-type="cart"]',
+   '.fastrr-checkout[data-type="mini-cart"]',
+   '.sr-headless-checkout[data-type="cart"]',
+   '.sr-headless-checkout[data-type="mini-cart"]',
+ ];
+ const EXTERNAL_BUYNOW_SELECTORS = [
+   '.shiprocket-headless[data-type="product"]',
+   '.fastrr-checkout[data-type="product"]',
+   '.sr-headless-checkout[data-type="product"]',
+ ];
+
+ const SHADOW_HOST_SELECTORS = [
+   '#shiprocket-smart-cart-root',
+   '[data-app="shiprocket-smart-cart"]',
+ ];
+
+ const SHADOW_CHECKOUT_BTN_SELECTOR =
+   '#sr-buy-now-button, .mini-cart-order-btn, .sr-cart-checkout-button-container button';
+
+
+ // ── LAYER 1 — NEUTRALIZE EXTERNAL SDK METHODS ────────────────────────────
+ function neutralizeExternalSDKs() {
+   if (window.CashfreeOcc) neutralizeExternalCheckoutSdk();
+
+   let _cashfreeOcc = window.CashfreeOcc;
+   Object.defineProperty(window, 'CashfreeOcc', {
+     configurable: true,
+     get() { return _cashfreeOcc; },
+     set(newVal) {
+       _cashfreeOcc = newVal;
+       neutralizeExternalCheckoutSdk();
+     }
+   });
+
+   const EXTERNAL_SDK_GLOBALS = ['ShiprocketCheckout', 'FastrrCheckout', 'PickrrCheckout', 'FastrCheckout'];
+   EXTERNAL_SDK_GLOBALS.forEach(function (globalName) {
+     let _val = window[globalName];
+     Object.defineProperty(window, globalName, {
+       configurable: true,
+       get() { return _val; },
+       set(newVal) {
+         _val = newVal;
+         if (newVal && !newVal.__gokwikNeutralized) {
+           ['initCheckout', 'checkout', 'openCheckout', 'init', 'open', 'trigger'].forEach(function (method) {
+             if (typeof newVal[method] === 'function') {
+               newVal[method] = function () {
+                 console.log('[GoKwik OCC] Blocked ' + globalName + '.' + method);
+               };
+             }
+           });
+           newVal.__gokwikNeutralized = true;
+         }
+       },
+     });
+   });
+
+   try {
+     window.handleShiprocketSmartCartBuy = function () {
+       console.log('[GoKwik OCC] Blocked handleShiprocketSmartCartBuy — GoKwik is handling checkout');
+     };
+     let _srHandler = window.handleShiprocketSmartCartBuy;
+     Object.defineProperty(window, 'handleShiprocketSmartCartBuy', {
+       configurable: true,
+       get() { return _srHandler; },
+       set(newVal) {
+         _srHandler = function () {
+           console.log('[GoKwik OCC] Blocked re-assigned handleShiprocketSmartCartBuy');
+         };
+       }
+     });
+   } catch (e) {
+     console.warn('[GoKwik OCC] Could not intercept handleShiprocketSmartCartBuy:', e);
+   }
+ }
+
+
+ function neutralizeExternalCheckoutSdk() {
+   if (!window.CashfreeOcc || window.CashfreeOcc.__gokwikNeutralized) return;
+
+   const originalInitCheckout = window.CashfreeOcc.initCheckout?.bind(window.CashfreeOcc);
+   const originalInitBuyNow   = window.CashfreeOcc.initBuyItNow?.bind(window.CashfreeOcc);
+
+   window.CashfreeOcc.initCheckout = function (btn) {
+     if (!btn || !btn.classList) { originalInitCheckout && originalInitCheckout(btn); return; }
+     if (btn.classList.contains(UNIQUE_CLASS)) {
+       console.log("GoKwik: Blocked CashfreeOcc.initCheckout on GoKwik button");
+       return;
+     }
+     if (BUTTON_TYPES.includes(btn.nodeName)) {
+       const raw = ((btn.textContent || '') + ' ' + (btn.value || '')).replace(/\s/g, '').toLowerCase();
+       if (CHECKOUT_TEXT.some(t => raw.includes(t))) {
+         console.log("GoKwik: Intercepted CashfreeOcc.initCheckout — claiming button");
+         replaceButton(btn, "checkout");
+         return;
+       }
+     }
+     originalInitCheckout && originalInitCheckout(btn);
+   };
+
+   window.CashfreeOcc.initBuyItNow = function (btn) {
+     if (!btn || !btn.classList) { originalInitBuyNow && originalInitBuyNow(btn); return; }
+     if (btn.classList.contains(UNIQUE_CLASS)) {
+       console.log("GoKwik: Blocked CashfreeOcc.initBuyItNow on GoKwik button");
+       return;
+     }
+     if (BUTTON_TYPES.includes(btn.nodeName)) {
+       const raw = ((btn.textContent || '') + ' ' + (btn.value || '')).replace(/\s/g, '').toLowerCase();
+       if (BUYNOW_TEXT.some(t => raw.includes(t))) {
+         console.log("GoKwik: Intercepted CashfreeOcc.initBuyItNow — claiming button");
+         replaceButton(btn, "buyNow");
+         return;
+       }
+     }
+     originalInitBuyNow && originalInitBuyNow(btn);
+   };
+
+   ['checkout', 'openCheckout', 'init', 'open', 'trigger'].forEach(function (method) {
+     if (typeof window.CashfreeOcc[method] === 'function') {
+       var _orig = window.CashfreeOcc[method].bind(window.CashfreeOcc);
+       window.CashfreeOcc[method] = function () {
+         if (document.querySelector('.' + UNIQUE_CLASS)) {
+           console.log('[GoKwik OCC] Blocked CashfreeOcc.' + method);
+           return;
+         }
+         return _orig.apply(this, arguments);
+       };
+     }
+   });
+
+   window.CashfreeOcc.__gokwikNeutralized = true;
+ }
+
+
+ // ── LAYER 2 — BLOCK EXTERNAL CLASS INJECTION ─────────────────────────────
+ function blockExternalClassInjection() {
+   const originalAdd = DOMTokenList.prototype.add;
+
+   DOMTokenList.prototype.add = function (...classes) {
+     const hasExternal = classes.some(c => EXTERNAL_CLASSES.includes(c));
+     if (hasExternal) {
+       const el = this._element || findElementByClassList(this);
+       if (el && el.classList && el.dataset.gokwikProcessed) {
+         const safeClasses = classes.filter(c => !EXTERNAL_CLASSES.includes(c));
+         if (safeClasses.length) originalAdd.apply(this, safeClasses);
+         return;
+       }
+     }
+     originalAdd.apply(this, classes);
+   };
+
+   const originalDescriptor = Object.getOwnPropertyDescriptor(Element.prototype, 'classList');
+   if (originalDescriptor) {
+     Object.defineProperty(Element.prototype, 'classList', {
+       get() {
+         const list = originalDescriptor.get.call(this);
+         list._element = this;
+         return list;
+       },
+       configurable: true
+     });
+   }
+ }
+
+ function findElementByClassList(classList) {
+   try {
+     return document.querySelector(
+       '[data-gokwik-processed].' + Array.from(classList).join('.')
+     );
+   } catch (e) {
+     return null;
+   }
+ }
+
+
+ // ── LAYER 3 — CAPTURE-PHASE CLICK HANDLER ───────────────────────────────
+ window.addEventListener("click", function gokwikClickCapture(e) {
+   try {
+     let target = null;
+
+     const path = (e.composedPath && e.composedPath()) || [];
+     for (var i = 0; i < path.length; i++) {
+       var node = path[i];
+       if (node.classList && node.classList.contains(UNIQUE_CLASS)) {
+         target = node;
+         break;
+       }
+     }
+
+     if (!target && e.target && typeof e.target.closest === "function") {
+       target = e.target.closest("." + UNIQUE_CLASS);
+     }
+
+     if (
+       target &&
+       target.classList.contains(UNIQUE_CLASS) &&
+       (target.dataset.gokwikFunction || target.dataset.function) &&
+       !target.classList.contains('gokwik-sold-out')
+     ) {
+       e.preventDefault();
+       e.stopPropagation();
+       e.stopImmediatePropagation();
+       const type = target.dataset.gokwikFunction || target.dataset.function;
+       showLoader(target);
+       // Store timeout ID so executeFlow can cancel it right before opening the popup.
+       // This prevents the "Processing..." text from disappearing before the popup opens.
+       target.__gkLoaderTimeout = setTimeout(() => hideLoader(target), LOADER_TIME);
+       executeFlow(target, type, e);
+     }
+   } catch (err) {
+     console.error("GoKwik: click capture error", err);
+   }
+ }, true);
+
+
+ // Activate layers 1 and 2 immediately
+ neutralizeExternalSDKs();
+ blockExternalClassInjection();
+
+
+ // ── FORM SUBMIT BLOCK ───────────────────────────────────────────────────
+ const originalSubmit = HTMLFormElement.prototype.submit;
+ HTMLFormElement.prototype.submit = function () {
+   if (document.querySelector(".gokwik-marge.processing")) {
+     console.warn("GoKwik: Blocked native form.submit()");
+     return;
+   }
+   return originalSubmit.apply(this, arguments);
+ };
+
+ document.addEventListener("submit", function (e) {
+   if (document.querySelector(".gokwik-marge.processing")) {
+     e.preventDefault();
+     e.stopPropagation();
+     e.stopImmediatePropagation();
+   }
+ }, true);
+
+
+ // ── LOCATION LOCK ───────────────────────────────────────────────────────
+ const _origAssign  = window.location.assign;
+ const _origReplace = window.location.replace;
+
+ window.location.assign = function (url) {
+   if (window._gokwikLock) { console.warn("GoKwik: Blocked assign:", url); return; }
+   _origAssign.call(window.location, url);
+ };
+ window.location.replace = function (url) {
+   if (window._gokwikLock) { console.warn("GoKwik: Blocked replace:", url); return; }
+   _origReplace.call(window.location, url);
+ };
+
+
+ // ── LOADER ──────────────────────────────────────────────────────────────
+ function showLoader(btn) {
+   btn.dataset.originalText = btn.innerHTML;
+   btn.innerHTML = "Processing...";
+   btn.disabled  = true;
+   btn.classList.add("processing");
+   window._gokwikLock = true;
+ }
+
+ function hideLoader(btn) {
+   btn.innerHTML  = btn.dataset.originalText || btn.innerHTML;
+   btn.disabled   = false;
+   btn.classList.remove("processing");
+   window._gokwikLock = false;
+ }
+
+
+ // ── FORM DETECTION ──────────────────────────────────────────────────────
+ function getProductForm(btn) {
+   let form = btn.closest("form");
+   if (form && !form.querySelector('[name="id"]')) form = null;
+   if (!form) {
+     const forms = document.querySelectorAll("form[action*='/cart/add']");
+     form = Array.from(forms).find(f => f.offsetParent !== null && f.querySelector('[name="id"]'));
+   }
+   if (!form) form = document.querySelector("form[action*='/cart/add']");
+   return form;
+ }
+
+
+ // ── SDK RESOLVER ────────────────────────────────────────────────────────
+ function getGoKwikSdk() {
+   if (window.gokwikSdk) window.__gkSdkCache = window.gokwikSdk;
+   return window.gokwikSdk || window.__gkSdkCache || null;
+ }
+
+
+
+ // ── SDK READINESS ───────────────────────────────────────────────────────
+ function waitForGoKwik() {
+   return new Promise((resolve) => {
+     if (getGoKwikSdk()) return resolve();
+     let done = false;
+     // Named handler so we can remove it on both resolution paths (prevents listener leak).
+     var handler = function () {
+       if (!done) { done = true; window.removeEventListener("gokwikLoaded", handler); resolve(); }
+     };
+     window.addEventListener("gokwikLoaded", handler);
+     // 3 s is plenty — beyond this the SDK is not coming and we proceed without it.
+     setTimeout(function () {
+       if (!done) { done = true; window.removeEventListener("gokwikLoaded", handler); resolve(); }
+     }, 3000);
+   });
+ }
+
+
+ // ── PRODUCT MODAL CLOSE ─────────────────────────────────────────────────
+ function closeOpenProductModal() {
+   const MODAL_SELECTORS = [
+     'quick-add-dialog',
+     '.quick-add-modal',
+     '[id*="quick-add" i]',
+     '.product-popup',
+     '.product-modal',
+     '.modal--product',
+     '[class*="quick-view"]',
+     '[class*="quickview"]',
+     '[class*="product-quick"]',
+   ];
+
+   for (var i = 0; i < MODAL_SELECTORS.length; i++) {
+     var sel = MODAL_SELECTORS[i];
+     var el;
+     try { el = document.querySelector(sel); } catch (e) { continue; }
+     if (!el) continue;
+     var dialog = (el.tagName === 'DIALOG') ? el : el.querySelector('dialog[open], dialog');
+     if (!dialog || !dialog.hasAttribute('open')) continue;
+     var closeBtn = el.querySelector(
+       '.quick-add-modal__close, button.close-button, ' +
+       'button[aria-label*="close" i], button[ref="closeButton"], ' +
+       '.modal__close-button, .js-modal-close, [data-modal-close]'
+     );
+     if (closeBtn) {
+       closeBtn.click();
+       console.log('[GoKwik OCC] Closed product modal via close button:', sel);
+       return true;
+     }
+     try { dialog.close(); } catch (e) {}
+     dialog.removeAttribute('open');
+     console.log('[GoKwik OCC] Closed product modal via dialog.close():', sel);
+     return true;
+   }
+   return false;
+ }
+
+
+ // ── CART DRAWER CLOSE ───────────────────────────────────────────────────
+ function closeOpenCartDrawer() {
+  const CART_DRAWER_SELECTORS = [
+    '.cart-drawer',
+    'cart-drawer',
+    '.cart-notification',
+    'cart-notification',
+    '.mini-cart',
+    '.side-cart',
+    '.cart__drawer',
+    '.offcanvas-cart',
+    '.drawer--cart',
+    '.cart-slide',
+    '.flyout-cart',
+    '.wt-cart', 
+    '[data-cart-drawer]',
+    '[id*="cart-drawer" i]',
+    '[id*="CartDrawer"]',
+  ];
+
+  for (var i = 0; i < CART_DRAWER_SELECTORS.length; i++) {
+    var sel = CART_DRAWER_SELECTORS[i];
+    var el;
+
+    try {
+      el = document.querySelector(sel);
+    } catch (e) {
+      continue;
+    }
+
+    if (!el) continue;
+
+    // =========================
+    // WT CART CASE
+    // =========================
+    if (el.classList.contains('wt-cart')) {
+      var wtIsOpen = el.hasAttribute('open');
+      var wtCloseBtn = el.querySelector('.wt-cart__drawer__close--button');
+
+      if (wtIsOpen && wtCloseBtn) {
+        wtCloseBtn.click();
+        console.log('[GoKwik OCC] Closed wt-cart drawer');
+        return true;
+      }
+    }
+
+    // =========================
+    // DIALOG CASE
+    // =========================
+    var dialog = (el.tagName === 'DIALOG') ? el : el.querySelector('dialog');
+
+    if (dialog && dialog.hasAttribute('open')) {
+      try {
+        dialog.close();
+      } catch (e) {}
+
+      dialog.removeAttribute('open');
+
+      console.log('[GoKwik OCC] Closed cart drawer via dialog.close():', sel);
+      return true;
+    }
+
+    // =========================
+    // GENERIC close()
+    // =========================
+    if (typeof el.close === 'function') {
+      try {
+        el.close();
+        console.log('[GoKwik OCC] Closed cart drawer via el.close():', sel);
+        return true;
+      } catch (e) {}
+    }
+
+    // =========================
+    // OPEN STATE DETECTION
+    // =========================
+    var isOpen = (
+      el.classList.contains('is-open') ||
+      el.classList.contains('open') ||
+      el.classList.contains('active') ||
+      el.classList.contains('is-active') ||
+      el.classList.contains('visible') ||
+      el.getAttribute('aria-hidden') === 'false' ||
+      el.getAttribute('aria-expanded') === 'true' ||
+      el.hasAttribute('open')
+    );
+
+    if (isOpen) {
+      var closeBtn = el.querySelector(
+        'button.cart-drawer__close, ' +
+        'button[class*="close-cart"], ' +
+        'button[aria-label*="close" i], ' +
+        '[data-drawer-close], ' +
+        '.js-close-cart, ' +
+        '.cart__close, ' +
+        '.wt-cart__drawer__close--button' 
+      );
+
+      if (closeBtn) {
+        closeBtn.click();
+        console.log('[GoKwik OCC] Closed cart drawer via close button:', sel);
+        return true;
+      }
+
+      el.classList.remove(
+        'is-open',
+        'open',
+        'active',
+        'is-active',
+        'visible'
+      );
+
+      el.setAttribute('aria-hidden', 'true');
+      el.removeAttribute('open');
+
+      console.log('[GoKwik OCC] Closed cart drawer via class toggle:', sel);
+      return true;
+    }
+  }
+
+  return false;
+}
+
+
+ // ── OPEN GOKWIK ─────────────────────────────────────────────────────────
+ function openGoKwikCheckout(sdk, closedModal, btn) {
+   const drawerClosed = closedModal ? false : closeOpenCartDrawer();
+   const delay = (closedModal || drawerClosed) ? 150 : 0;
+   if (delay) {
+     setTimeout(() => {
+       sdk.initCheckout(window.merchantInfo);
+       if (btn) hideLoader(btn);
+       setTimeout(() => { window._gokwikLock = false; }, 2500);
+     }, delay);
+   } else {
+     sdk.initCheckout(window.merchantInfo);
+     if (btn) hideLoader(btn);
+     setTimeout(() => { window._gokwikLock = false; }, 2500);
+   }
+ }
+
+
+ // ── EXECUTE FLOW ────────────────────────────────────────────────────────
+ async function executeFlow(btn, type, e) {
+   console.log("[GoKwik OCC] executeFlow — type=" + type + ", gokwikSdk ready=" + !!window.gokwikSdk);
+   await waitForGoKwik();
+   const sdk = getGoKwikSdk();
+   console.log("[GoKwik OCC] executeFlow after waitForGoKwik — sdk=" + !!sdk);
+
+   try {
+     // ── BUY NOW ───────────────────────────────────────────────────────
+     if (type === "buyNow") {
+       const form      = getProductForm(btn);
+       const formData  = form ? new FormData(form) : null;
+       const variantId = formData
+         ? (formData.get("id") || form.querySelector("[name='id']")?.value)
+         : null;
+
+       if (!variantId) {
+         console.log("[GoKwik OCC] buyNow: no variant context → cart checkout flow");
+         if (sdk) {
+           // Cancel the blind safety-net timeout; hideLoader will be called by openGoKwikCheckout.
+           if (btn.__gkLoaderTimeout) { clearTimeout(btn.__gkLoaderTimeout); btn.__gkLoaderTimeout = null; }
+           const modalClosed = closeOpenProductModal();
+           openGoKwikCheckout(sdk, modalClosed, btn);
+         } else {
+           console.warn("[GoKwik OCC] SDK unavailable — cannot open GoKwik checkout");
+           hideLoader(btn);
+         }
+         return;
+       }
+
+       const quantity =
+         parseInt(formData.get("quantity")) ||
+         parseInt(form.querySelector("[name='quantity']")?.value) || 1;
+
+       if (typeof onBuyNowClick === 'function') {
+         // Cancel the blind safety-net timeout; hideLoader called below after SDK trigger.
+         if (btn.__gkLoaderTimeout) { clearTimeout(btn.__gkLoaderTimeout); btn.__gkLoaderTimeout = null; }
+         const modalClosed = closeOpenProductModal();
+         const delay = modalClosed ? 150 : 0;
+         if (delay) {
+           setTimeout(() => {
+             onBuyNowClick(e, false, [{ id: variantId, quantity: quantity }]);
+             hideLoader(btn);
+           }, delay);
+         } else {
+           onBuyNowClick(e, false, [{ id: variantId, quantity: quantity }]);
+           hideLoader(btn);
+         }
+         return;
+       }
+
+       console.warn("[GoKwik OCC] onBuyNowClick unavailable — GoKwik SDK may not have loaded");
+       hideLoader(btn);
+       return;
+     }
+
+     // ── CHECKOUT ──────────────────────────────────────────────────────
+     if (type === "checkout") {
+       if (sdk) {
+         // Cancel the blind safety-net timeout; popup is about to open.
+         if (btn.__gkLoaderTimeout) { clearTimeout(btn.__gkLoaderTimeout); btn.__gkLoaderTimeout = null; }
+         const drawerClosed = closeOpenCartDrawer();
+         if (drawerClosed) {
+           setTimeout(() => {
+             sdk.initCheckout(window.merchantInfo);
+             hideLoader(btn);
+             setTimeout(() => { window._gokwikLock = false; }, 2500);
+           }, 150);
+         } else {
+           sdk.initCheckout(window.merchantInfo);
+           hideLoader(btn);
+           setTimeout(() => { window._gokwikLock = false; }, 2500);
+         }
+         return;
+       }
+     }
+
+     // ── FALLBACK ──────────────────────────────────────────────────────
+     console.warn("[GoKwik OCC] SDK not available — falling back to native checkout");
+     window.location.href = "/checkout";
+
+   } catch (err) {
+     console.error("[GoKwik OCC] executeFlow error:", err);
+     window.location.href = "/checkout";
+   }
+ }
+
+
+ // ── BUTTON REPLACEMENT ──────────────────────────────────────────────────
+ function replaceButton(node, type) {
+   try {
+     if (!node || !node.parentNode) return;
+     if (node.dataset.gokwikProcessed) return;
+
+     const clone = node.cloneNode(true);
+     clone.dataset.gokwikProcessed = "true";
+     clone.onclick = null;
+     clone.removeAttribute("onclick");
+     if (clone.tagName === "BUTTON") clone.type = "button";
+
+     clone.classList.add(UNIQUE_CLASS);
+     clone.dataset.function       = type;
+     clone.dataset.gokwikFunction = type;
+
+     EXTERNAL_CLASSES.forEach(cls => clone.classList.remove(cls));
+     hidePoweredByBranding(clone);
+
+     node.parentNode.replaceChild(clone, node);
+     return clone;
+   } catch (err) {
+     console.error("GoKwik: replaceButton error", err);
+     return null;
+   }
+ }
+
+
+ // ── NORMALIZE ───────────────────────────────────────────────────────────
+ const normalize = (text) => text?.replace(/\s/g, "").toLowerCase() || "";
+
+ // ── VISIBILITY CHECK ─────────────────────────────────────────────────────
+ // Returns false for hidden buttons (display:none, visibility:hidden, zero size).
+ // Used in attach() to prevent claiming invisible native checkout buttons that
+ // sit alongside a third-party checkout widget.
+ function isElementVisible(el) {
+   try {
+     if (!el) return false;
+     var rect = el.getBoundingClientRect();
+     if (rect.width === 0 && rect.height === 0) return false;
+     var style = window.getComputedStyle(el);
+     if (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') return false;
+     return true;
+   } catch (e) {
+     return true; // fail open — don't block visible buttons due to errors
+   }
+ }
+
+ // ── HIDE SHIPROCKET BRANDING ─────────────────────────────────────────────
+ function hidePoweredByBranding(el) {
+   try {
+     var branded = el.querySelector('#sr-powered-by');
+     if (branded) branded.style.setProperty('display', 'none', 'important');
+   } catch (e) {}
+ }
+
+ function injectShadowStyle(shadowRoot) {
+   if (!shadowRoot || shadowRoot._gkStyleInjected) return;
+   shadowRoot._gkStyleInjected = true;
+   try {
+     var style = document.createElement('style');
+     style.setAttribute('data-gokwik', 'true');
+     style.textContent = '#sr-powered-by { display: none !important; }';
+     shadowRoot.appendChild(style);
+     console.log('[GoKwik OCC] Injected branding-hide style into shadow root');
+   } catch (err) {
+     console.error('[GoKwik OCC] injectShadowStyle error', err);
+   }
+ }
+
+
+ // ── SOLD-OUT SYNC ───────────────────────────────────────────────────────
+ function findAddToCartBtn(referenceEl) {
+   const PRODUCT_SCOPES = [
+     'product-form-component',
+     '[data-type="add-to-cart-form"]',
+     'form[action*="/cart/add"]',
+     '[data-section-id]',
+     '.product-form',
+     '.product__info-container',
+   ];
+   let scope = null;
+   for (var pi = 0; pi < PRODUCT_SCOPES.length; pi++) {
+     try { scope = referenceEl.closest(PRODUCT_SCOPES[pi]); if (scope) break; } catch (e) {}
+   }
+   // Do NOT fall back to document when the button is inside a cart drawer or
+   // mini-cart context. Doing so causes watchSoldOutState to pick up a disabled
+   // add-to-cart from a different product section and incorrectly mark the
+   // third-party checkout button as sold-out.
+   if (!scope) {
+     var CART_CONTEXTS = ['#CartDrawer', '.cart-drawer', '[id*="cart-drawer"]',
+                          '[class*="cart-drawer"]', '[data-type="mini-cart"]'];
+     for (var ci = 0; ci < CART_CONTEXTS.length; ci++) {
+       try { if (referenceEl.closest(CART_CONTEXTS[ci])) return null; } catch (e) {}
+     }
+     scope = document;
+   }
+
+   const ADD_SELS = [
+     'button[name="add"]:not([data-gokwik-processed])',
+     'button[type="submit"][name="add"]:not([data-gokwik-processed])',
+     '.product-form__submit',
+     'button.add-to-cart-button',
+     '[data-testid="standalone-add-to-cart"]',
+     '[data-testid*="add-to-cart"]',
+   ];
+   for (var ai = 0; ai < ADD_SELS.length; ai++) {
+     try {
+       var found = scope.querySelector(ADD_SELS[ai]);
+       if (found) return found;
+     } catch (e) {}
+   }
+   return null;
+ }
+
+ function isSoldOut(addToCartBtn) {
+   if (!addToCartBtn) return false;
+   if (addToCartBtn.disabled) return true;
+   var t = normalize(addToCartBtn.textContent || '');
+   return t.includes('soldout') || t.includes('unavailable') ||
+          t.includes('outofstock') || t.includes('notavailable');
+ }
+
+ function applySoldOutState(gokwikBtn, addToCartBtn) {
+   var soldOut = isSoldOut(addToCartBtn);
+   gokwikBtn.disabled = soldOut;
+   gokwikBtn.setAttribute('aria-disabled', String(soldOut));
+   gokwikBtn.classList.toggle('gokwik-sold-out', soldOut);
+   gokwikBtn.style.opacity       = soldOut ? '0.5' : '';
+   gokwikBtn.style.cursor        = soldOut ? 'not-allowed' : '';
+   gokwikBtn.style.pointerEvents = soldOut ? 'none' : '';
+   if (soldOut) console.log('[GoKwik OCC] Buy Now disabled — product sold out');
+ }
+
+ function watchSoldOutState(gokwikBtn, addToCartBtn) {
+   if (!addToCartBtn) return;
+   new MutationObserver(function () {
+     applySoldOutState(gokwikBtn, addToCartBtn);
+   }).observe(addToCartBtn, {
+     attributes:      true,
+     attributeFilter: ['disabled', 'class', 'aria-disabled'],
+     childList:       true,
+     subtree:         true,
+     characterData:   true,
+   });
+ }
+
+
+ // ── BUTTON DECORATION ───────────────────────────────────────────────────
+ function decorateButton(el) {
+   if (!el || el.dataset.gkDecorated) return;
+   el.dataset.gkDecorated = 'true';
+
+   if (!['BUTTON', 'A', 'INPUT'].includes(el.tagName)) return;
+
+   var cfg = window.gkBtnConfig || {};
+   var fn  = el.dataset.gokwikFunction || el.dataset.function || '';
+   var isCheckout = fn === 'checkout';
+   var isBuyNow   = fn === 'buyNow';
+   if (!isCheckout && !isBuyNow) return;
+
+   var subText      = isCheckout ? (cfg.checkoutSubText   || '') : (cfg.buyNowSubText   || '');
+   var enableBanner = isCheckout ?  !!cfg.checkoutEnableBanner   :  !!cfg.buyNowEnableBanner;
+   var enableLogo   = isCheckout ?  !!cfg.checkoutEnableLogo     :  !!cfg.buyNowEnableLogo;
+
+   if (!subText && !enableLogo) return;
+
+   if (enableBanner && subText) {
+     if (!el.parentNode) return;
+     if (el.parentNode.classList && el.parentNode.classList.contains('gk-btn-wrap')) return;
+     var wrap = document.createElement('div');
+     wrap.className = 'gk-btn-wrap';
+     var bannerEl = document.createElement('div');
+     bannerEl.className = 'gk-banner';
+     bannerEl.textContent = subText;
+     el.parentNode.insertBefore(wrap, el);
+     wrap.appendChild(bannerEl);
+     wrap.appendChild(el);
+     if (enableLogo) {
+       var bIcons = document.createElement('span');
+       bIcons.className = 'gk-pay-icons';
+       bIcons.innerHTML = '<img src="https://cdn.gokwik.co/v4/images/upi-icons.svg" alt="UPI" />' +
+                          '<img src="https://cdn.gokwik.co/v4/images/right-arrow.svg" alt="" />';
+       el.appendChild(bIcons);
+     }
+     return;
+   }
+
+   var inner = document.createElement('span');
+   inner.className = 'gk-inner';
+
+   var textBlock = document.createElement('span');
+   textBlock.className = 'gk-text-block';
+
+   var mainSpan = document.createElement('span');
+   mainSpan.className = 'gk-btn-main';
+   while (el.firstChild) { mainSpan.appendChild(el.firstChild); }
+   textBlock.appendChild(mainSpan);
+
+   if (subText) {
+     var subSpan = document.createElement('span');
+     subSpan.className = 'gk-sub-text';
+     subSpan.textContent = subText;
+     textBlock.appendChild(subSpan);
+   }
+
+   inner.appendChild(textBlock);
+
+   if (enableLogo) {
+     var icons = document.createElement('span');
+     icons.className = 'gk-pay-icons';
+     icons.innerHTML = '<img src="https://cdn.gokwik.co/v4/images/upi-icons.svg" alt="UPI" />' +
+                       '<img src="https://cdn.gokwik.co/v4/images/right-arrow.svg" alt="" />';
+     inner.appendChild(icons);
+   }
+
+   el.appendChild(inner);
+ }
+
+
+ // ── ATTACH ──────────────────────────────────────────────────────────────
+ function attach(node) {
+   try {
+     if (!node?.nodeName) return;
+     if (!BUTTON_TYPES.includes(node.nodeName)) return;
+     if (node.dataset.gokwikProcessed) return;
+     if (!isElementVisible(node)) return;
+
+     var cfg = window.gkBtnConfig || {};
+
+     var parentClaimed = node.closest && node.closest('[data-gokwik-function]');
+     if (parentClaimed && parentClaimed !== node) {
+       var inheritedType = parentClaimed.dataset.gokwikFunction;
+       if (inheritedType === 'checkout' && cfg.checkoutEnabled !== false) {
+         const clone = replaceButton(node, 'checkout');
+         if (clone) decorateButton(clone);
+         return;
+       }
+       if (inheritedType === 'buyNow' && cfg.buyNowEnabled !== false) {
+         const clone = replaceButton(node, 'buyNow');
+         if (clone) {
+           decorateButton(clone);
+           const addToCartBtn = findAddToCartBtn(clone);
+           applySoldOutState(clone, addToCartBtn);
+           watchSoldOutState(clone, addToCartBtn);
+         }
+         return;
+       }
+       return;
+     }
+
+     const text  = normalize(node.textContent);
+     const value = normalize(node.value);
+
+     if (cfg.checkoutEnabled !== false && CHECKOUT_TEXT.some(t => text.includes(t) || value.includes(t))) {
+       const clone = replaceButton(node, "checkout");
+       if (clone) decorateButton(clone);
+       return;
+     }
+     if (cfg.buyNowEnabled !== false && BUYNOW_TEXT.some(t => text.includes(t) || value.includes(t))) {
+       
+       if (node.nodeName === 'A') {
+         var _href = (node.getAttribute('href') || '').trim();
+         if (_href && _href !== '#' && !_href.startsWith('javascript:')) {
+           var _hrefLc = _href.toLowerCase();
+           var _isNavLink = (_hrefLc.includes('/products/') || _hrefLc.includes('/collections/')) &&
+                            !_hrefLc.includes('/cart') && !_hrefLc.includes('/checkout');
+           if (_isNavLink) {
+             console.log('[GoKwik OCC] Skipping navigation anchor for buyNow — href:', _href);
+             return;
+           }
+         }
+       }
+       const clone = replaceButton(node, "buyNow");
+       if (clone) {
+         decorateButton(clone);
+         const addToCartBtn = findAddToCartBtn(clone);
+         applySoldOutState(clone, addToCartBtn);
+         watchSoldOutState(clone, addToCartBtn);
+       }
+       return;
+     }
+   } catch (err) {
+     console.error("GoKwik: attach error", err);
+   }
+ }
+
+
+ // ── EXTERNAL NODE CLAIM ─────────────────────────────────────────────────
+ function claimExternalNode(el, type) {
+   try {
+     if (!el || el.dataset.gokwikProcessed) return;
+     var cfg = window.gkBtnConfig || {};
+     if (type === 'checkout' && cfg.checkoutEnabled === false) return;
+     if (type === 'buyNow'   && cfg.buyNowEnabled   === false) return;
+     el.dataset.gokwikProcessed = 'true';
+     el.classList.add(UNIQUE_CLASS);
+     el.dataset.gokwikFunction = type;
+     el.dataset.function       = type;
+     hidePoweredByBranding(el);
+     console.log('[GoKwik OCC] Claimed external ' + type + ' element:', el.className || el.tagName);
+     decorateButton(el);
+   } catch (err) {
+     console.error('[GoKwik OCC] claimExternalNode error', err);
+   }
+ }
+
+ function scanExternalNodes() {
+   EXTERNAL_CHECKOUT_SELECTORS.forEach(function (sel) {
+     document.querySelectorAll(sel).forEach(function (el) { claimExternalNode(el, 'checkout'); });
+   });
+   EXTERNAL_BUYNOW_SELECTORS.forEach(function (sel) {
+     document.querySelectorAll(sel).forEach(function (el) { claimExternalNode(el, 'buyNow'); });
+   });
+ }
+
+
+ // ── SHADOW DOM SUPPORT ──────────────────────────────────────────────────
+ var _observedShadowRoots = new WeakSet();
+
+ function claimShadowButton(shadowRoot, btn, type) {
+   try {
+     if (!btn || btn.dataset.gokwikProcessed) return;
+     btn.dataset.gokwikProcessed = 'true';
+     btn.onclick = null;
+     btn.removeAttribute('onclick');
+     if (btn.tagName === 'BUTTON') btn.type = 'button';
+     btn.classList.add(UNIQUE_CLASS);
+     btn.dataset.gokwikFunction = type;
+     btn.dataset.function       = type;
+     EXTERNAL_CLASSES.forEach(cls => btn.classList.remove(cls));
+     hidePoweredByBranding(btn);
+     console.log('[GoKwik OCC] Claimed shadow DOM button:', btn.id || btn.className);
+     injectShadowStyle(shadowRoot);
+     observeShadowRoot(shadowRoot);
+   } catch (err) {
+     console.error('[GoKwik OCC] claimShadowButton error', err);
+   }
+ }
+
+ function observeShadowRoot(shadowRoot) {
+   if (!shadowRoot || _observedShadowRoots.has(shadowRoot)) return;
+   _observedShadowRoots.add(shadowRoot);
+   new MutationObserver(function () {
+     shadowRoot.querySelectorAll(SHADOW_CHECKOUT_BTN_SELECTOR).forEach(function (btn) {
+       claimShadowButton(shadowRoot, btn, 'checkout');
+     });
+   }).observe(shadowRoot, { childList: true, subtree: true });
+   console.log('[GoKwik OCC] Observing shadow root for re-renders');
+ }
+
+ function scanShadowRoots() {
+   SHADOW_HOST_SELECTORS.forEach(function (selector) {
+     var host;
+     try { host = document.querySelector(selector); } catch (e) { return; }
+     if (!host) return;
+     var shadow = host.shadowRoot;
+     if (!shadow) return;
+     shadow.querySelectorAll(SHADOW_CHECKOUT_BTN_SELECTOR).forEach(function (btn) {
+       claimShadowButton(shadow, btn, 'checkout');
+     });
+   });
+ }
+
+
+ // ── SCAN + OBSERVE ──────────────────────────────────────────────────────
+ function scanAll() {
+   const allButtons = document.querySelectorAll("button, a, input");
+   console.log("[GoKwik OCC] scanAll — found " + allButtons.length + " elements to check");
+   allButtons.forEach(attach);
+   scanExternalNodes();
+   scanShadowRoots();
+   const claimed = document.querySelectorAll("." + UNIQUE_CLASS);
+   console.log("[GoKwik OCC] scanAll done — " + claimed.length + " button(s) claimed by GoKwik");
+   if (claimed.length === 0) {
+     console.warn("[GoKwik OCC] No buttons claimed. Check that CHECKOUT_TEXT / BUYNOW_TEXT match your button labels.");
+   }
+ }
+
+ function observe() {
+   const ALL_EXTERNAL_SELS = [...EXTERNAL_CHECKOUT_SELECTORS, ...EXTERNAL_BUYNOW_SELECTORS];
+
+   const observer = new MutationObserver((mutations) => {
+     mutations.forEach((mutation) => {
+       mutation.addedNodes.forEach((node) => {
+         if (!(node instanceof Element)) return;
+         [node, ...node.querySelectorAll("button, a, input")].forEach(attach);
+         ALL_EXTERNAL_SELS.forEach((sel) => {
+           const type = EXTERNAL_CHECKOUT_SELECTORS.includes(sel) ? "checkout" : "buyNow";
+           try {
+             if (node.matches && node.matches(sel)) claimExternalNode(node, type);
+             node.querySelectorAll(sel).forEach((el) => claimExternalNode(el, type));
+           } catch (e) {}
+         });
+         var isShadowHost = SHADOW_HOST_SELECTORS.some(function (sel) {
+           try { return node.matches(sel) || node.querySelector(sel); } catch (e) { return false; }
+         });
+         if (isShadowHost) {
+           setTimeout(scanShadowRoots, 100);
+         }
+       });
+     });
+   });
+   observer.observe(document.body, { childList: true, subtree: true });
+ }
+
+
+ // ── OWNERSHIP SWEEP ─────────────────────────────────────────────────────
+ function startOwnershipSweep() {
+   setInterval(() => {
+     document.querySelectorAll("." + UNIQUE_CLASS).forEach(btn => {
+       EXTERNAL_CLASSES.forEach(cls => {
+         if (btn.classList.contains(cls)) btn.classList.remove(cls);
+       });
+       if (
+         btn.dataset.gokwikFunction &&
+         btn.dataset.function !== btn.dataset.gokwikFunction
+       ) {
+         btn.dataset.function = btn.dataset.gokwikFunction;
+       }
+     });
+
+     document.querySelectorAll(
+       'button[name="checkout"]:not([data-gokwik-processed]), ' +
+       'input[name="checkout"]:not([data-gokwik-processed]), ' +
+       'a[href*="/checkout"]:not([data-gokwik-processed])'
+     ).forEach(attach);
+     scanExternalNodes();
+     scanShadowRoots();
+   }, 500);
+ }
+
+
+ // ── CART DRAWER OPEN — RE-SCAN TRIGGER ──────────────────────────────────
+ function observeCartEvents() {
+   const CART_OPEN_EVENTS = [
+     'cart:open', 'cart-drawer:open', 'CartDrawer:open',
+     'sidebar-cart:open', 'mini-cart:open', 'sidecart:open',
+     'cart:toggle', 'ajax-cart:open', 'cart:refresh',
+   ];
+   CART_OPEN_EVENTS.forEach(function (evt) {
+     document.addEventListener(evt, function () { setTimeout(scanAll, 200); }, { capture: true, passive: true });
+   });
+
+   var cartDrawerEls = document.querySelectorAll(
+     '.cart-drawer, cart-drawer, .mini-cart, .side-cart, .cart__drawer, .offcanvas-cart, .flyout-cart'
+   );
+   cartDrawerEls.forEach(function (el) {
+     new MutationObserver(function () { setTimeout(scanAll, 200); }).observe(el, {
+       attributes: true,
+       attributeFilter: ['class', 'aria-hidden', 'open', 'aria-expanded'],
+     });
+   });
+ }
+
+
+ // ── INTERNATIONAL FLOW GATE ─────────────────────────────────────────────
+ async function _initWithCountryCheck() {
+   try {
+     const res  = await fetch("/browsing_context_suggestions.json");
+     const data = await res.json();
+     if (data?.detected_values?.country_name !== "India") {
+       console.log("GoKwik OCC: International user — skipping injection.");
+       return;
+     }
+   } catch (err) {
+     console.warn("GoKwik: Country check failed, defaulting to OCC", err);
+   }
+   scanAll();
+   observe();
+   startOwnershipSweep();
+   observeCartEvents();
+ }
+
+
+ // ── INIT ────────────────────────────────────────────────────────────────
+ function init() {
+   if (window.__GOKWIK_OCC_INIT__) return;
+   window.__GOKWIK_OCC_INIT__ = true;
+
+   
+
+   if (!window.gokwikIntlFlow) {
+     scanAll();
+     observe();
+     startOwnershipSweep();
+     observeCartEvents();
+     return;
+   }
+
+   console.log("[GoKwik OCC] International flow ON — checking country...");
+   _initWithCountryCheck();
+ }
+
+
+ if (document.readyState === "loading") {
+   document.addEventListener("DOMContentLoaded", init);
+ } else {
+   init();
+ }
+
+
+})();
+</script>
+
+{%- comment -%}gk-stamp:1781588627743{%- endcomment -%}

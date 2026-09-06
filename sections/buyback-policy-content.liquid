@@ -1,0 +1,130 @@
+<div class="page-width buyback-policy-content-container">
+  <h2>{{ section.settings.heading }}</h2>
+  {{ section.settings.content }}
+  <h2>{{ section.settings.heading_2 }}</h2>
+  {{ section.settings.content_2 }}
+</div>
+<div class="buyback-cta-container">
+  <button id="buyback-cta-button">Claim BuyBack</button>
+</div>
+
+<script>
+  document.getElementById('buyback-cta-button').addEventListener('click', function () {
+    const phoneNumber = '918851812814'; // Include country code (91 for India)
+    const message = encodeURIComponent('Hi');
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
+
+    // Redirect to WhatsApp
+    window.location.href = whatsappUrl;
+  });
+</script>
+
+<style>
+  .buyback-policy-content-container {
+    color: #000;
+  }
+  .buyback-policy-content-container h2 {
+    font-size: 2rem;
+    font-weight: 500;
+    font-family: 'Montserrat', sans-serif;
+    margin-bottom: 0;
+    margin-top: 35px;
+  }
+  .buyback-policy-content-container p {
+    font-size: 1.6rem;
+    font-weight: 400;
+    font-family: 'Montserrat', sans-serif;
+    margin-bottom: 0;
+    margin-top: 10px;
+    line-height: 2rem;
+  }
+  .buyback-policy-content-container h3 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 500;
+    font-size: 1.8rem;
+  }
+  .buyback-cta-container {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    justify-content: end;
+    align-items: center;
+    padding: 15px;
+    background: #f2eeeb;
+    z-index: 1;
+  }
+  #buyback-cta-button {
+    background: #712242;
+    color: #fff;
+    font-size: 2rem;
+    padding: 10px 40px;
+    border: none;
+    font-weight: 400;
+    cursor: pointer;
+    font-family: 'Montserrat', sans-serif;
+    margin-right: 12rem;
+  }
+  @media (max-width: 1290px) {
+    #buyback-cta-button {
+      margin-right: 4rem;
+    }
+  }
+  @media (max-width: 756px) {
+    #buyback-cta-button {
+      margin-right: 0;
+    }
+    .buyback-cta-container {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 20px;
+      background: #f9f7f9;
+      z-index: 10;
+    }
+    .buyback-cta-container button {
+      width: 100%;
+      display: flex;
+      text-align: center;
+      justify-content: center;
+      align-items: center;
+      margin-top: 0;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Home About Us",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Section Heading"
+    },
+    {
+      "type": "richtext",
+      "id": "content",
+      "label": "Content"
+    },
+    {
+      "type": "text",
+      "id": "heading_2",
+      "label": "Section Heading 2"
+    },
+    {
+      "type": "richtext",
+      "id": "content_2",
+      "label": "Content 2"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Buyback Policy Content"
+    }
+  ]
+}
+{% endschema %}

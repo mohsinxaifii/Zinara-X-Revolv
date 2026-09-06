@@ -1,0 +1,40 @@
+<section class="page-width about-us-content-container about-section">
+  <div class="container custom-width">
+    <div class="row align-items-center">
+      <div>
+        {{ section.settings.about_us_content }}
+      </div>
+    </div>
+  </div>
+</section>
+<style>
+  .about-us-content-container p {
+    text-align: center;
+    font-size: 1.6rem;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 400;
+  }
+  @media (max-width: 756px) {
+    .about-us-content-container p {
+      font-size: 1.4rem;
+      line-height: 2rem;
+    }
+  }
+</style>
+{% schema %}
+{
+  "name": "About Us Content",
+  "settings": [
+    {
+      "type": "richtext",
+      "id": "about_us_content",
+      "label": "About Us Content"
+    }
+  ],
+  "presets": [
+    {
+      "name": "About Us Content"
+    }
+  ]
+}
+{% endschema %}

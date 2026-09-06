@@ -1,0 +1,62 @@
+<section class="page-width home-try-at-home-section-container">
+  <div class="home-try-at-home-section">
+    <div class="home-try-at-home-section-left">
+      <h2 class="section-heading">{{ section.settings.heading }}</h2>
+      <p>{{ section.settings['sub-heading'] }}</p>
+      <div>
+        <a href="{{section.settings.url-1}}">{{ section.settings['button-1'] }}</a>
+      </div>
+    </div>
+    <div class="home-try-at-home-section-right">
+      <img class="home-try-at-home-section-right-desktop_image" src="{{ section.settings.image | img_url: 'master' }}" alt="Try at Home">
+      <img class="home-try-at-home-section-right-mobile_image" src="{{ section.settings.mobile_image | img_url: 'master' }}" alt="Try at Home">
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Get Own Design",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Section Heading",
+      "default": "Get your own design"
+    },
+    {
+      "type": "text",
+      "id": "sub-heading",
+      "label": "Sub Heading",
+      "default": "Have another design in mind? Something from a website or a magazine perhaps?"
+    },
+    {
+      "type": "text",
+      "id": "button-1",
+      "label": "Button 1 Text",
+      "default": "Start Designing"
+    },
+    {
+      "type": "url",
+      "id": "url-1",
+      "label": "Button 1 URL"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Desktop Image"
+    },
+        {
+      "type": "image_picker",
+      "id": "mobile_image",
+      "label": "Mobile Image"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Get Own Design",
+      "category": "Custom"
+    }
+  ]
+}
+{% endschema %}

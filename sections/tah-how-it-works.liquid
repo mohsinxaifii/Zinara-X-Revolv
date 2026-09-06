@@ -1,0 +1,155 @@
+<div class="page-width tah-how-it-works-container">
+  <h2 class="page-width section-heading">{{ section.settings.heading }}</h2>
+  <div class="tah-how-it-works">
+    <img src="{{ section.settings.image_1 | img_url }}">
+    <p>{{ section.settings.text_1 }}</p>
+  </div>
+  <div class="tah-how-it-works">
+    <img src="{{ section.settings.image_2 | img_url }}">
+    <p>{{ section.settings.text_2 }}</p>
+  </div>
+  <div class="tah-how-it-works">
+    <img src="{{ section.settings.image_3 | img_url }}">
+    <p>{{ section.settings.text_3 }}</p>
+  </div>
+</div>
+<style>
+  .tah-content-header_helpline-container {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0;
+  }
+  .tah-content-header_helpline-container div:first-of-type div:first-of-type {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+  .tah-content-header_helpline-container div:first-of-type {
+    align-items: start;
+  }
+  .tah-content-header_helpline-container div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: fit-content;
+    flex-direction: column;
+  }
+  .tah-content-header_helpline-container img {
+    width: 25px;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    cursor: pointer;
+  }
+  .tah-content-header_helpline-container p {
+    font-family: 'Montserrat', sans-serif;
+    color: #171717;
+    font-size: 3rem;
+    margin: 0 0 0 15px;
+    font-weight: 500;
+  }
+  .tah-content-header_helpline-container a {
+    margin: 0 15px 0 0;
+    color: #712242;
+    font-weight: 600;
+    text-decoration: underline;
+    cursor: pointer !important;
+    text-align: right;
+    display: flex;
+    align-items: center;
+  }
+  .tah-content-header_helpline-container a span {
+    line-height: 1.1rem;
+  }
+  .tah-how-it-works-container .section-heading {
+    padding: 0;
+    width: 100%;
+    margin-bottom: 1rem !important;
+  }
+  .tah-how-it-works-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 2rem;
+  }
+  .tah-how-it-works {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+  }
+  .tah-how-it-works img {
+    background-color: #f4eeeb;
+    padding: 15px;
+    width: 65px;
+    height: auto;
+    border-radius: 15px 0 15px 0;
+  }
+  @media (max-width: 756px) {
+    .tah-content-header_helpline-container p {
+      font-size: 2.4rem;
+      margin: 0 0 0 10px;
+    }
+    .tah-content-header_helpline-container a {
+      margin: 0 15px 0 0;
+    }
+    .tah-content-header_helpline-container img {
+      width: 20px;
+    }
+    .tah-content-header_helpline-container {
+      margin-top: 20px;
+    }
+  }
+</style>
+{% schema %}
+{
+  "name": "TAH How It Works",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Section Heading",
+      "default": "How it works"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_1",
+      "label": "Image 1"
+    },
+    {
+      "type": "text",
+      "id": "text_1",
+      "label": "Text 1",
+      "default": "Choose your designs (Upto 10)"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_2",
+      "label": "Image 2"
+    },
+    {
+      "type": "text",
+      "id": "text_2",
+      "label": "Text 2",
+      "default": "A Zinara professional will come to your home"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_3",
+      "label": "Image 3"
+    },
+    {
+      "type": "text",
+      "id": "text_3",
+      "label": "Text 3",
+      "default": "Own your favourite designs"
+    }
+  ],
+  "blocks": [],
+  "presets": [
+    {
+      "name": "TAH How It Works"
+    }
+  ]
+}
+{% endschema %}

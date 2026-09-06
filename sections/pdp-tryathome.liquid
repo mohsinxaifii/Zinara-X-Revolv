@@ -1,0 +1,66 @@
+<section class="pdp-try-at-home-section-container">
+  <div class="page-width home-try-at-home-section">
+    <div class="home-try-at-home-section-left">
+      <h2 class="section-heading">{{ section.settings.heading }}</h2>
+      <p>{{ section.settings['sub-heading'] }}</p>
+      <div>
+        <a href="{{section.settings.url-1}}">{{ section.settings['button-1'] }}</a>
+        <a href="{{section.settings.url-2}}">{{ section.settings['button-2'] }}</a>
+      </div>
+    </div>
+    <div class="home-try-at-home-section-right">
+      <img src="{{ section.settings.image | img_url: 'master' }}" alt="Try at Home">
+    </div>
+  </div>
+</section>
+{% schema %}
+{
+  "name": "PDP Try at Home",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Section Heading",
+      "default": "Want to see designs personally?"
+    },
+    {
+      "type": "text",
+      "id": "sub-heading",
+      "label": "Sub Heading",
+      "default": "Get designs to try at home or schedule a video call"
+    },
+    {
+      "type": "text",
+      "id": "button-1",
+      "label": "Button 1 Text",
+      "default": "Try at Home"
+    },
+    {
+      "type": "url",
+      "id": "url-1",
+      "label": "Button 1 URL"
+    },
+    {
+      "type": "text",
+      "id": "button-2",
+      "label": "Button 2 Text",
+      "default": "Video Call"
+    },
+    {
+      "type": "url",
+      "id": "url-2",
+      "label": "Button 2 URL"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    }
+  ],
+  "presets": [
+    {
+      "name": "PDP Try at Home"
+    }
+  ]
+}
+{% endschema %}

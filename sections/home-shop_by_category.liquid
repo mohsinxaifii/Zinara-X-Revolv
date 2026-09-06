@@ -1,0 +1,167 @@
+<section class="page-width home-shop_by_category-section">
+  <h2 class="home-shop_by_category-section-heading">{{ section.settings.heading }}</h2>
+  <p class="home-shop_by_category-section-subheading">{{ section.settings.subheading }}</p>
+  <div class="home-shop_by_category-section-blocks_container">
+    {% for block in section.blocks %}
+      <a class="home-shop_by_category-block" href="{{ block.settings.url }}">
+        <img
+          src="{{ block.settings.image | image_url }}"
+          class="home-shop_by_category-block-image lazyload"
+          loading="lazy"
+          width="{{ block.settings.image.width }}"
+          height="{{ block.settings.image.height }}"
+          alt=""
+          style="aspect-ratio: {{ block.settings.image.aspect_ratio }};"
+        >
+        <h3 class="home-shop_by_category-block-heading">{{ block.settings.heading }}</h3>
+      </a>
+    {% endfor %}
+  </div>
+</section>
+<style>
+  .home-shop_by_category-section {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    letter-spacing: 0;
+    margin-top: 60px;
+    margin-bottom: 60px;
+    letter-spacing: 0;
+  }
+  .home-shop_by_category-section-heading {
+    font-weight: 400;
+    color: #000;
+    font-size: 2rem;
+    margin: 0;
+  }
+  .home-shop_by_category-section-subheading {
+    font-size: 1.4rem;
+    margin: 5px 0 30px;
+    color: #000;
+    font-weight: 400;
+    line-height: 2rem;
+  }
+  .home-shop_by_category-section-blocks_container {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    gap: 10px;
+  }
+  .home-shop_by_category-block {
+    width: 24%;
+    text-decoration: none;
+    height: auto;
+  }
+  .home-shop_by_category-block-image {
+    width: 100%;
+    height: auto;
+    display: flex;
+  }
+  .home-shop_by_category-block-heading {
+    font-weight: 400;
+    font-size: 1.4rem;
+    text-decoration: none;
+    margin: 15px 0 0;
+    color: #000;
+  }
+  .home-shop_by_category-block-subheading {
+    font-size: 1.2rem;
+    margin: 5px 0 20px;
+    font-weight: 400;
+    text-decoration: none;
+    line-height: 2rem;
+    color: #000;
+  }
+  .home-shop_by_category-block .btn {
+    font-size: 1.5rem;
+    color: #712242;
+    text-decoration: none;
+    font-weight: 400;
+    transition: all ease-in 0.15s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+    gap: 10px;
+  }
+  .home-shop_by_category-block .btn span {
+    height: 1.3rem;
+    width: 1.3rem;
+    display: flex;
+  }
+  .home-shop_by_category-block .btn span svg {
+    width: 100%;
+    height: 100%;
+  }
+  @media (max-width: 756px) {
+    .home-shop_by_category-section-subheading {
+      width: 90%;
+      margin-bottom: 15px !important;
+    }
+    .home-shop_by_category-section {
+      align-items: center;
+      justify-content: center;
+      margin-top: 30px !important;
+      margin-bottom: 30px !important;
+    }
+    .home-shop_by_category-section-blocks_container {
+      flex-wrap: wrap;
+      gap: 20px;
+      align-items: center;
+      justify-content: center;
+    }
+    .home-shop_by_category-block {
+      width: 47%;
+    }
+    .home-shop_by_category-block-heading {
+      margin: 10px 0 0;
+    }
+  }
+</style>
+{% schema %}
+{
+  "name": "Home Shop by Category",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Section Heading",
+      "default": "Shop by Metal"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Section Subheading",
+      "default": "Metal that works for you and makes you feel perfect"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "block",
+      "name": "Metal Type",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "URL"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Home Shop by Category"
+    }
+  ]
+}
+{% endschema %}

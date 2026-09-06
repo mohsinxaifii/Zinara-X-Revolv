@@ -1,0 +1,259 @@
+{% comment %}
+  Renders product variant options
+
+  Accepts:
+  - product: {Object} product object.
+  - option: {Object} current product_option object.
+  - block: {Object} block object.
+  - picker_type: {String} type of picker to dispay
+
+
+  Usage:
+  {% render 'product-variant-options',
+    product: product,
+    option: option,
+    block: block
+    picker_type: picker_type
+  %}
+{% endcomment %}
+{%- liquid
+  assign product_form_id = 'product-form-' | append: section.id
+-%}
+{%- for value in option.values -%}
+  {%- liquid
+    assign swatch_focal_point = null
+    if value.swatch.image
+      assign image_url = value.swatch.image | image_url: width: 50
+      assign swatch_value = 'url(' | append: image_url | append: ')'
+      assign swatch_focal_point = value.swatch.image.presentation.focal_point
+    elsif value.swatch.color
+      assign swatch_value = 'rgb(' | append: value.swatch.color.rgb | append: ')'
+    else
+      assign swatch_value = null
+    endif
+
+    assign option_disabled = true
+    if value.available
+      assign option_disabled = false
+    endif
+  -%}
+  {%- capture input_id -%}
+    {{ section.id }}-{{ option.position }}-{{ forloop.index0 -}}
+  {%- endcapture -%}
+  {%- capture input_name -%}
+    {{ option.name }}-{{ option.position }}
+  {%- endcapture -%}
+  {%- capture input_dataset -%}
+    data-product-url="{{ value.product_url }}"
+    data-option-value-id="{{ value.id }}"
+  {%- endcapture -%}
+  {%- capture label_unavailable -%}
+    <span class="visually-hidden label-unavailable">
+      {{- 'products.product.variant_sold_out_or_unavailable' | t -}}
+    </span>
+  {%- endcapture -%}
+  {%- if picker_type == 'swatch' -%}
+    {%- capture help_text -%}
+      <span class="visually-hidden">{{ value | escape }}</span>
+      {{ label_unavailable }}
+    {%- endcapture -%}
+    {%
+      render 'swatch-input',
+      id: input_id,
+      name: input_name,
+      value: value | escape,
+      swatch: value.swatch,
+      product_form_id: product_form_id,
+      checked: value.selected,
+      visually_disabled: option_disabled,
+      shape: block.settings.swatch_shape,
+      help_text: help_text,
+      additional_props: input_dataset
+    %}
+  {%- elsif picker_type == 'button' -%}
+    <input
+      type="radio"
+      id="{{ input_id }}"
+      name="{{ input_name | escape }}"
+      value="{{ value | escape }}"
+      form="{{ product_form_id }}"
+      {% if value.selected %}
+        checked
+      {% endif %}
+      {% if option_disabled %}
+        class="disabled"
+      {% endif %}
+      {{ input_dataset }}
+    >
+    <label for="{{ input_id }}">
+      {{ value -}}
+      {{ label_unavailable }}
+    </label>
+  {%- elsif picker_type == 'dropdown' or picker_type == 'swatch_dropdown' -%}
+    <option
+      id="{{ input_id }}"
+      value="{{ value | escape }}"
+      {% if value.selected %}
+        selected="selected"
+      {% endif %}
+      {% if swatch_value and picker_type == 'swatch_dropdown' %}
+        data-option-swatch-value="{{ swatch_value }}"
+        {% if swatch_focal_point %}
+          data-option-swatch-focal-point="{{ swatch_focal_point }}"
+        {% endif %}
+      {% endif %}
+      {{ input_dataset }}
+    >
+      {% if option_disabled -%}
+        {{- 'products.product.value_unavailable' | t: option_value: value -}}
+      {%- else -%}
+        {% comment %} <span class="Variant-type-label">{{ option.name }}</span>: {{ value }} {% endcomment %}
+        {{ value }}
+      {%- endif %}
+    </option>
+  {%- endif -%}
+{%- endfor -%}
+{% comment %}
+  <script>
+    (function() {
+      // Wait until DOM is loaded
+      document.addEventListener('DOMContentLoaded', function() {
+        // --- Utility to get customer and address info ---
+        var customer = window.customer || {};
+        var defaultAddress = (customer && customer.default_address) || {};
+        function getAddress() {
+          if (!customer || !defaultAddress) return null;
+          var parts = [
+            defaultAddress.address1,
+            defaultAddress.address2,
+            defaultAddress.city,
+            defaultAddress.province,
+            defaultAddress.country,
+            defaultAddress.zip
+          ].filter(Boolean);
+          return parts.join(', ');
+        }
+
+        // --- Prepare product variants if needed (fallback) ---
+        // Attempt to parse product data from Liquid (ensure main-product.liquid includes product JSON).
+        var productData = window.product || null;
+        if (!productData) {
+          try {
+            // If window.product not set, try injecting via Liquid
+            productData = {{ product | json }};
+          } catch(e) {
+            productData = null;
+          }
+        }
+        var allVariants = (productData && productData.variants) || [];
+        var optionNames = (productData && productData.options) || [];
+
+        // Variables to hold change data for fallback
+        var lastChangeData = null;
+        var fallbackTimer = null;
+
+        // Function to send analytics event
+        function sendEvent(data, variant) {
+          var eventParams = {
+            option_label: data.optionLabel,
+            previous_value: data.prevValue,
+            new_value: data.newValue,
+            selected_variant: {
+              id: variant.id,
+              title: variant.title,
+              sku: variant.sku,
+              price: variant.price ? (variant.price / 100) : null
+            },
+            customer_id: customer.id || null,
+            email: customer.email || null,
+            name: defaultAddress.name || ( (customer.first_name || '') + ' ' + (customer.last_name || '') ).trim() || null,
+            phone: customer.phone || (defaultAddress.phone || null),
+            address: getAddress(),
+            source_url: window.location.href,
+            page_title: document.title
+          };
+          if (typeof gtag === 'function') {
+            gtag('event', data.eventName, eventParams);
+          }
+        }
+
+        // Handler for select change
+        function onSelectChange(e) {
+          var select = e.target;
+          var nameAttr = select.getAttribute('name') || '';
+          var match = nameAttr.match(/^options\[(.*)\]$/);
+          if (!match) return;
+          var optionLabel = match[1]; // e.g. "Metal Type" or "Size"
+          var eventName = (optionLabel === "Metal Type") ? 'metal_type_click' :
+                          (optionLabel === "Size" ? 'size_click' : null);
+          if (!eventName) return;
+          var prevValue = select.__previousValue || '';
+          var newValue = select.value;
+          // Update stored previous value for future changes
+          select.__previousValue = newValue;
+          // Prepare data for this change
+          lastChangeData = {
+            optionLabel: optionLabel,
+            eventName: eventName,
+            prevValue: prevValue,
+            newValue: newValue
+          };
+          // Clear any existing fallback timer
+          if (fallbackTimer) {
+            clearTimeout(fallbackTimer);
+          }
+          // Fallback: in case 'variant:change' event does not fire, send after delay
+          fallbackTimer = setTimeout(function() {
+            if (!lastChangeData) return;
+            var data = lastChangeData;
+            lastChangeData = null;
+            // Find variant by matching all option values
+            var variantFound = null;
+            if (allVariants.length && optionNames.length) {
+              var selectedOptions = optionNames.map(function(optName) {
+                var sel = document.querySelector('variant-selects select[name="options[' + optName + ']"]');
+                return sel ? sel.value : '';
+              });
+              variantFound = allVariants.find(function(v) {
+                for (var i = 0; i < selectedOptions.length; i++) {
+                  if (v.options[i] !== selectedOptions[i]) return false;
+                }
+                return true;
+              });
+            }
+            if (variantFound) {
+              sendEvent(data, variantFound);
+            }
+          }, 500);
+        }
+
+        // Attach listeners to Metal Type and Size selects inside variant-selects
+        var metalSelect = document.querySelector('variant-selects select[name="options[Metal Type]"]');
+        var sizeSelect = document.querySelector('variant-selects select[name="options[Size]"]');
+        [metalSelect, sizeSelect].forEach(function(select) {
+          if (!select) return;
+          // Initialize previous value
+          select.__previousValue = select.value;
+          // Listen for focus to update previous value before change
+          select.addEventListener('focus', function() {
+            this.__previousValue = this.value;
+          });
+          // Listen for change events
+          select.addEventListener('change', onSelectChange);
+        });
+
+        // Listen for the theme's variant:change event for accurate variant data
+        document.addEventListener('variant:change', function(event) {
+          if (!lastChangeData) return;
+          var variant = event.detail.variant;
+          // Send GA event with updated variant info
+          sendEvent(lastChangeData, variant);
+          lastChangeData = null;
+          if (fallbackTimer) {
+            clearTimeout(fallbackTimer);
+          }
+        });
+      });
+    })();
+  </script>
+{% endcomment %}

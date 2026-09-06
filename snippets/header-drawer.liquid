@@ -1,0 +1,599 @@
+{% comment %}
+  Renders a header drawer menu for mobile and desktop.
+
+  Usage:
+  {% render 'header-drawer' %}
+{% endcomment %}
+
+<header-drawer data-breakpoint="{% if section.settings.menu_type_desktop == 'drawer' %}desktop{% else %}tablet{% endif %}">
+  <details id="Details-menu-drawer-container" class="menu-drawer-container">
+    <summary
+      class="header__icon header__icon--menu header__icon--summary link focus-inset"
+      aria-label="{{ 'sections.header.menu' | t }}"
+    >
+      <span>
+        <svg class="icon icon-hamburger" viewBox="0 0 16 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M0.300781 11.0502V10.3502H15.7008V11.0502H0.300781ZM0.300781 6.3502V5.6502H15.7008V6.3502H0.300781ZM0.300781 1.6502V0.950195H15.7008V1.6502H0.300781Z" fill="#712242"></path>
+        </svg>
+        {{- 'icon-close.svg' | inline_asset_content -}}
+      </span>
+    </summary>
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        const summaryBtn = document.querySelector('.header__icon--menu');
+
+        if (summaryBtn) {
+          summaryBtn.addEventListener('click', function (e) {
+            const clickedElement = e.target;
+
+            if (clickedElement.closest('svg') && clickedElement.closest('svg').outerHTML.includes('icon-hamburger')) {
+              // Prepare event data
+              const eventData = {
+                event_category: 'Navigation',
+                event_label: 'Hamburger Menu',
+                source: 'Header Drawer',
+                customer_email: {{ customer.email | json }},
+                customer_id: {{ customer.id | json }},
+                customer_first_name: {{ customer.first_name | json }},
+                customer_last_name: {{ customer.last_name | json }}
+              };
+
+              // Fire GA4 event
+              gtag('event', 'menu_click', eventData);
+
+              // ✅ Meta Pixel: send same custom event
+              if (typeof fbq === 'function') {
+                fbq('trackCustom', 'menu_click', eventData);
+              }
+
+              console.log('menu_click event triggered with customer details');
+            }
+          });
+        }
+      });
+    </script>
+
+    <div id="menu-drawer" class="gradient menu-drawer motion-reduce color-{{ section.settings.menu_color_scheme }}">
+      <div class="menu-drawer__inner-container">
+        <div class="menu-drawer__navigation-container">
+          <nav class="menu-drawer__navigation">
+            {% comment %}
+              <ul class="menu-drawer__menu has-submenu list-menu" role="list">
+                {%- for link in section.settings.menu.links -%}
+                  <li>
+                    {%- if link.links != blank -%}
+                      <details id="Details-menu-drawer-menu-item-{{ forloop.index }}">
+                        <summary
+                          id="HeaderDrawer-{{ link.handle }}"
+                          class="menu-drawer__menu-item list-menu__item link link--text focus-inset{% if link.child_active %} menu-drawer__menu-item--active{% endif %}"
+                        >
+                          {{ link.title | escape }}
+                          <span class="svg-wrapper">
+                            {{- 'icon-arrow.svg' | inline_asset_content -}}
+                          </span>
+                          <span class="svg-wrapper">
+                            {{- 'icon-caret.svg' | inline_asset_content -}}
+                          </span>
+                        </summary>
+                        <div
+                          id="link-{{ link.handle | escape }}"
+                          class="menu-drawer__submenu has-submenu gradient motion-reduce"
+                          tabindex="-1"
+                        >
+                          <div class="menu-drawer__inner-submenu">
+                            <button class="menu-drawer__close-button link link--text focus-inset" aria-expanded="true">
+                              <span class="svg-wrapper">
+                                {{- 'icon-arrow.svg' | inline_asset_content -}}
+                              </span>
+                              {{ link.title | escape }}
+                            </button>
+                            <ul class="menu-drawer__menu list-menu" role="list" tabindex="-1">
+                              {%- for childlink in link.links -%}
+                                <li>
+                                  {%- if childlink.links == blank -%}
+                                    <a
+                                      id="HeaderDrawer-{{ link.handle }}-{{ childlink.handle }}"
+                                      href="{{ childlink.url }}"
+                                      class="menu-drawer__menu-item link link--text list-menu__item focus-inset{% if childlink.current %} menu-drawer__menu-item--active{% endif %}"
+                                      {% if childlink.current %}
+                                        aria-current="page"
+                                      {% endif %}
+                                    >
+                                      {{ childlink.title | escape }}
+                                    </a>
+                                  {%- else -%}
+                                    <details id="Details-menu-drawer-{{ link.handle }}-{{ childlink.handle }}">
+                                      <summary
+                                        id="HeaderDrawer-{{ link.handle }}-{{ childlink.handle }}"
+                                        class="menu-drawer__menu-item link link--text list-menu__item focus-inset"
+                                      >
+                                        {{ childlink.title | escape }}
+                                        <span class="svg-wrapper">
+                                          {{- 'icon-arrow.svg' | inline_asset_content -}}
+                                        </span>
+                                        <span class="svg-wrapper">
+                                          {{- 'icon-caret.svg' | inline_asset_content -}}
+                                        </span>
+                                      </summary>
+                                      <div
+                                        id="childlink-{{ childlink.handle | escape }}"
+                                        class="menu-drawer__submenu has-submenu gradient motion-reduce"
+                                      >
+                                        <button
+                                          class="menu-drawer__close-button link link--text focus-inset"
+                                          aria-expanded="true"
+                                        >
+                                          <span class="svg-wrapper">
+                                            {{- 'icon-arrow.svg' | inline_asset_content -}}
+                                          </span>
+                                          {{ childlink.title | escape }}
+                                        </button>
+                                        <ul
+                                          class="menu-drawer__menu list-menu"
+                                          role="list"
+                                          tabindex="-1"
+                                        >
+                                          {%- for grandchildlink in childlink.links -%}
+                                            <li>
+                                              <a
+                                                id="HeaderDrawer-{{ link.handle }}-{{ childlink.handle }}-{{ grandchildlink.handle }}"
+                                                href="{{ grandchildlink.url }}"
+                                                class="menu-drawer__menu-item link link--text list-menu__item focus-inset{% if grandchildlink.current %} menu-drawer__menu-item--active{% endif %}"
+                                                {% if grandchildlink.current %}
+                                                  aria-current="page"
+                                                {% endif %}
+                                              >
+                                                {{ grandchildlink.title | escape }}
+                                              </a>
+                                            </li>
+                                          {%- endfor -%}
+                                        </ul>
+                                      </div>
+                                    </details>
+                                  {%- endif -%}
+                                </li>
+                              {%- endfor -%}
+                            </ul>
+                          </div>
+                        </div>
+                      </details>
+                    {%- else -%}
+                      <a
+                        id="HeaderDrawer-{{ link.handle }}"
+                        href="{{ link.url }}"
+                        class="menu-drawer__menu-item list-menu__item link link--text focus-inset{% if link.current %} menu-drawer__menu-item--active{% endif %}"
+                        {% if link.current %}
+                          aria-current="page"
+                        {% endif %}
+                      >
+                        {{ link.title | escape }}
+                      </a>
+                    {%- endif -%}
+                  </li>
+                {%- endfor -%}
+              </ul>
+            {% endcomment %}
+            <ul class="menu-drawer__menu list-menu" role="list">
+              {%- for link in section.settings.menu.links -%}
+                <li class="menu-item">
+                  {%- if link.links != blank -%}
+                    <details class="dropdown">
+                      <summary
+                        id="HeaderDrawer-{{ link.handle }}"
+                        class="menu-drawer__menu-item list-menu__item link link--text focus-inset{% if link.child_active %} menu-drawer__menu-item--active{% endif %}"
+                      >
+                        {{ link.title | escape }}
+                        <span class="svg-wrapper dropdown-icon">
+                          {{- 'icon-caret.svg' | inline_asset_content -}}
+                        </span>
+                      </summary>
+                      <ul class="dropdown-menu list-menu">
+                        {%- for childlink in link.links -%}
+                          <li class="menu-item">
+                            {%- if childlink.links == blank -%}
+                              <a
+                                id="HeaderDrawer-{{ link.handle }}-{{ childlink.handle }}"
+                                href="{{ childlink.url }}"
+                                class="menu-drawer__menu-item link link--text list-menu__item focus-inset{% if childlink.current %} menu-drawer__menu-item--active{% endif %}"
+                                {% if childlink.current %}
+                                  aria-current="page"
+                                {% endif %}
+                              >
+                                {{ childlink.title | escape }}
+                              </a>
+                            {%- else -%}
+                              <details class="dropdown">
+                                <summary
+                                  id="HeaderDrawer-{{ link.handle }}-{{ childlink.handle }}"
+                                  class="menu-drawer__menu-item link link--text list-menu__item focus-inset"
+                                >
+                                  {{ childlink.title | escape }}
+                                  <span class="svg-wrapper dropdown-icon">
+                                    {{- 'icon-caret.svg' | inline_asset_content -}}
+                                  </span>
+                                </summary>
+                                <ul class="dropdown-menu list-menu">
+                                  {%- for grandchildlink in childlink.links -%}
+                                    <li>
+                                      <a
+                                        id="HeaderDrawer-{{ link.handle }}-{{ childlink.handle }}-{{ grandchildlink.handle }}"
+                                        href="{{ grandchildlink.url }}"
+                                        class="menu-drawer__menu-item link link--text list-menu__item focus-inset{% if grandchildlink.current %} menu-drawer__menu-item--active{% endif %}"
+                                        {% if grandchildlink.current %}
+                                          aria-current="page"
+                                        {% endif %}
+                                      >
+                                        {{ grandchildlink.title | escape }}
+                                      </a>
+                                    </li>
+                                  {%- endfor -%}
+                                </ul>
+                              </details>
+                            {%- endif -%}
+                          </li>
+                        {%- endfor -%}
+                      </ul>
+                    </details>
+                  {%- else -%}
+                    <a
+                      id="HeaderDrawer-{{ link.handle }}"
+                      href="{{ link.url }}"
+                      class="menu-drawer__menu-item list-menu__item link link--text focus-inset{% if link.current %} menu-drawer__menu-item--active{% endif %}"
+                      {% if link.current %}
+                        aria-current="page"
+                      {% endif %}
+                    >
+                      {{ link.title | escape }}
+                    </a>
+                  {%- endif -%}
+                </li>
+              {%- endfor -%}
+            </ul>
+          </nav>
+          <div class="menu-drawer__utility-links">
+            {%- if shop.customer_accounts_enabled -%}
+              <a
+                href="{{ routes.account_url }}"
+                class="menu-drawer__account link focus-inset h5 medium-hide large-up-hide"
+                rel="nofollow"
+              >
+                {%- if section.settings.enable_customer_avatar -%}
+                  <account-icon>
+                    {%- if customer and customer.has_avatar? -%}
+                      {{ customer | avatar }}
+                    {%- else -%}
+                      <span class="svg-wrapper">
+                        {{- 'icon-account.svg' | inline_asset_content -}}
+                      </span>
+                    {%- endif -%}
+                  </account-icon>
+                {%- else -%}
+                  <span class="svg-wrapper">
+                    {{- 'icon-account.svg' | inline_asset_content -}}
+                  </span>
+                {%- endif -%}
+                {%- liquid
+                  if customer
+                    echo 'customer.account_fallback' | t
+                  else
+                    echo 'customer.log_in' | t
+                  endif
+                -%}
+              </a>
+            {%- endif -%}
+            {%- if localization.available_countries or localization.available_languages -%}
+              <div class="menu-drawer__localization header-localization">
+                {%- if localization.available_countries and localization.available_countries.size > 1 -%}
+                  <localization-form>
+                    {%- form 'localization', id: 'HeaderCountryMobileForm', class: 'localization-form' -%}
+                      <div>
+                        <h2 class="visually-hidden" id="HeaderCountryMobileLabel">
+                          {{ 'localization.country_label' | t }}
+                        </h2>
+                        {%- render 'country-localization', localPosition: 'HeaderCountryMobile' -%}
+                      </div>
+                    {%- endform -%}
+                  </localization-form>
+                {% endif %}
+
+                {%- if localization.available_languages and localization.available_languages.size > 1 -%}
+                  <localization-form>
+                    {%- form 'localization', id: 'HeaderLanguageMobileForm', class: 'localization-form' -%}
+                      <div>
+                        <h2 class="visually-hidden" id="HeaderLanguageMobileLabel">
+                          {{ 'localization.language_label' | t }}
+                        </h2>
+                        {%- render 'language-localization', localPosition: 'HeaderLanguageMobile' -%}
+                      </div>
+                    {%- endform -%}
+                  </localization-form>
+                {%- endif -%}
+              </div>
+            {%- endif -%}
+            <ul class="list list-social list-unstyled" role="list">
+              {%- if settings.social_twitter_link != blank -%}
+                <li class="list-social__item">
+                  <a href="{{ settings.social_twitter_link }}" class="list-social__link link">
+                    <span class="svg-wrapper">
+                      {{- 'icon-twitter.svg' | inline_asset_content -}}
+                    </span>
+                    <span class="visually-hidden">{{ 'general.social.links.twitter' | t }}</span>
+                  </a>
+                </li>
+              {%- endif -%}
+              {%- if settings.social_facebook_link != blank -%}
+                <li class="list-social__item">
+                  <a href="{{ settings.social_facebook_link }}" class="list-social__link link">
+                    <span class="svg-wrapper">
+                      {{- 'icon-facebook.svg' | inline_asset_content -}}
+                    </span>
+                    <span class="visually-hidden">{{ 'general.social.links.facebook' | t }}</span>
+                  </a>
+                </li>
+              {%- endif -%}
+              {%- if settings.social_pinterest_link != blank -%}
+                <li class="list-social__item">
+                  <a href="{{ settings.social_pinterest_link }}" class="list-social__link link">
+                    <span class="svg-wrapper">
+                      {{- 'icon-pinterest.svg' | inline_asset_content -}}
+                    </span>
+                    <span class="visually-hidden">{{ 'general.social.links.pinterest' | t }}</span>
+                  </a>
+                </li>
+              {%- endif -%}
+              {%- if settings.social_instagram_link != blank -%}
+                <li class="list-social__item">
+                  <a href="{{ settings.social_instagram_link }}" class="list-social__link link">
+                    <span class="svg-wrapper">
+                      {{- 'icon-instagram.svg' | inline_asset_content -}}
+                    </span>
+                    <span class="visually-hidden">{{ 'general.social.links.instagram' | t }}</span>
+                  </a>
+                </li>
+              {%- endif -%}
+              {%- if settings.social_tiktok_link != blank -%}
+                <li class="list-social__item">
+                  <a href="{{ settings.social_tiktok_link }}" class="list-social__link link">
+                    <span class="svg-wrapper">
+                      {{- 'icon-tiktok.svg' | inline_asset_content -}}
+                    </span>
+                    <span class="visually-hidden">{{ 'general.social.links.tiktok' | t }}</span>
+                  </a>
+                </li>
+              {%- endif -%}
+              {%- if settings.social_tumblr_link != blank -%}
+                <li class="list-social__item">
+                  <a href="{{ settings.social_tumblr_link }}" class="list-social__link link">
+                    <span class="svg-wrapper">
+                      {{- 'icon-tumblr.svg' | inline_asset_content -}}
+                    </span>
+                    <span class="visually-hidden">{{ 'general.social.links.tumblr' | t }}</span>
+                  </a>
+                </li>
+              {%- endif -%}
+              {%- if settings.social_snapchat_link != blank -%}
+                <li class="list-social__item">
+                  <a href="{{ settings.social_snapchat_link }}" class="list-social__link link">
+                    <span class="svg-wrapper">
+                      {{- 'icon-snapchat.svg' | inline_asset_content -}}
+                    </span>
+                    <span class="visually-hidden">{{ 'general.social.links.snapchat' | t }}</span>
+                  </a>
+                </li>
+              {%- endif -%}
+              {%- if settings.social_youtube_link != blank -%}
+                <li class="list-social__item">
+                  <a href="{{ settings.social_youtube_link }}" class="list-social__link link">
+                    <span class="svg-wrapper">
+                      {{- 'icon-youtube.svg' | inline_asset_content -}}
+                    </span>
+                    <span class="visually-hidden">{{ 'general.social.links.youtube' | t }}</span>
+                  </a>
+                </li>
+              {%- endif -%}
+              {%- if settings.social_vimeo_link != blank -%}
+                <li class="list-social__item">
+                  <a href="{{ settings.social_vimeo_link }}" class="list-social__link link">
+                    <span class="svg-wrapper">
+                      {{- 'icon-vimeo.svg' | inline_asset_content -}}
+                    </span>
+                    <span class="visually-hidden">{{ 'general.social.links.vimeo' | t }}</span>
+                  </a>
+                </li>
+              {%- endif -%}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </details>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      document.querySelectorAll('.menu-drawer summary.menu-drawer__menu-item').forEach(summary => {
+        summary.addEventListener('click', function () {
+          // Trim and check if the text content includes 'Shop'
+          const text = summary.textContent.trim().toLowerCase();
+          if (text.includes('shop')) {
+            const eventData = {
+              event_category: 'Navigation',
+              event_label: 'Shop Menu Click',
+              source: 'Menu Drawer',
+              customer_email: {{ customer.email | json }},
+              customer_id: {{ customer.id | json }},
+              customer_first_name: {{ customer.first_name | json }},
+              customer_last_name: {{ customer.last_name | json }}
+            };
+
+            gtag('event', 'menu_shop_click', eventData);
+
+            // ✅ Meta Pixel: fire the same event
+            if (typeof fbq === 'function') {
+              fbq('trackCustom', 'menu_shop_click', eventData);
+            }
+
+            console.log('menu_shop_click triggered with customer details');
+          }
+        });
+      });
+    });
+  </script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const shopSummary = document.querySelector('.menu-drawer summary.menu-drawer__menu-item');
+
+      if (shopSummary && shopSummary.textContent.trim().toLowerCase().includes('shop')) {
+        const shopDetails = shopSummary.closest('details');
+
+        if (shopDetails) {
+          shopDetails.querySelectorAll('li.menu-item').forEach(li => {
+            const link = li.querySelector('a');
+
+            if (link) {
+              link.addEventListener('click', function () {
+                const categoryText = link.textContent.trim();
+                const categoryHref = link.getAttribute('href');
+                const liContent = li.innerHTML.trim();
+
+                const eventData = {
+                  event_category: 'Navigation',
+                  event_label: categoryText,
+                  category_url: categoryHref,
+                  li_inner_html: liContent,
+                  source: 'Menu Drawer > Shop',
+                  customer_email: {{ customer.email | json }},
+                  customer_id: {{ customer.id | json }},
+                  customer_first_name: {{ customer.first_name | json }},
+                  customer_last_name: {{ customer.last_name | json }}
+                };
+
+                gtag('event', 'menu_category_click', eventData);
+
+                // ✅ Meta Pixel: fire same event
+                if (typeof fbq === 'function') {
+                  fbq('trackCustom', 'menu_category_click', eventData);
+                }
+
+                console.log('menu_category_click fired:', {
+                  event_label: categoryText,
+                  category_url: categoryHref,
+                  li_inner_html: liContent
+                });
+              });
+            }
+          });
+        }
+      }
+    });
+  </script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const buybackLink = document.querySelector('.menu-drawer__menu-item.list-menu__item[href*="buyback-policy"]');
+
+      if (buybackLink && buybackLink.textContent.trim().includes('Zinara Buyback Policy')) {
+        buybackLink.addEventListener('click', function () {
+          const linkText = buybackLink.textContent.trim();
+          const linkHref = buybackLink.getAttribute('href');
+
+          const eventData = {
+            event_category: 'Navigation',
+            event_label: linkText,
+            url: linkHref,
+            source: 'Menu Drawer',
+            customer_email: {{ customer.email | json }},
+            customer_id: {{ customer.id | json }},
+            customer_first_name: {{ customer.first_name | json }},
+            customer_last_name: {{ customer.last_name | json }}
+          };
+
+          gtag('event', 'menu_buyback_click', eventData);
+
+          // ✅ Meta Pixel: track same custom event
+          if (typeof fbq === 'function') {
+            fbq('trackCustom', 'menu_buyback_click', eventData);
+          }
+
+          console.log('menu_buyback_click fired:', {
+            event_label: linkText,
+            url: linkHref
+          });
+        });
+      }
+    });
+  </script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const exchangeLink = Array.from(document.querySelectorAll('.menu-drawer__menu-item.list-menu__item'))
+        .find(link => link.textContent.trim().includes('Zinara Exchange Policy'));
+
+      if (exchangeLink) {
+        exchangeLink.addEventListener('click', function () {
+          const linkText = exchangeLink.textContent.trim();
+          const linkHref = exchangeLink.getAttribute('href');
+
+          const eventData = {
+            event_category: 'Navigation',
+            event_label: linkText,
+            url: linkHref,
+            source: 'Menu Drawer',
+            customer_email: {{ customer.email | json }},
+            customer_id: {{ customer.id | json }},
+            customer_first_name: {{ customer.first_name | json }},
+            customer_last_name: {{ customer.last_name | json }}
+          };
+
+          gtag('event', 'menu_exchange_click', eventData);
+
+          // ✅ Meta Pixel: send same custom event
+          if (typeof fbq === 'function') {
+            fbq('trackCustom', 'menu_exchange_click', eventData);
+          }
+
+          console.log('menu_exchange_click fired:', {
+            event_label: linkText,
+            url: linkHref
+          });
+        });
+      }
+    });
+  </script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const ordersLink = Array.from(document.querySelectorAll('.menu-drawer__menu-item.list-menu__item'))
+        .find(link => link.textContent.trim().includes('Orders'));
+
+      if (ordersLink) {
+        ordersLink.addEventListener('click', function () {
+          const linkText = ordersLink.textContent.trim();
+          const linkHref = ordersLink.getAttribute('href');
+
+          const eventData = {
+            event_category: 'Navigation',
+            event_label: linkText,
+            url: linkHref,
+            source: 'Menu Drawer',
+            customer_email: {{ customer.email | json }},
+            customer_id: {{ customer.id | json }},
+            customer_first_name: {{ customer.first_name | json }},
+            customer_last_name: {{ customer.last_name | json }}
+          };
+
+          gtag('event', 'menu_orders_click', eventData);
+
+          // ✅ Meta Pixel: send same custom event
+          if (typeof fbq === 'function') {
+            fbq('trackCustom', 'menu_orders_click', eventData);
+          }
+
+          console.log('menu_orders_click fired:', {
+            event_label: linkText,
+            url: linkHref
+          });
+        });
+      }
+    });
+  </script>
+</header-drawer>

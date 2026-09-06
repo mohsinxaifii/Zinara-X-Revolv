@@ -1,0 +1,217 @@
+.product_details_stone_info_tabs {
+  display: flex;
+  gap: 5px;
+  justify-content: start;
+  align-items: start;
+  width: fit-content;
+  position: absolute;
+  bottom: -47px;
+  left: 34.4%;
+}
+
+.product_details_stone_info_tab {
+  background-color: #610c270d;
+  padding: 5px 7px;
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  align-items: center;
+}
+
+.product_details_stone_info_tab img {
+  width: 20px;
+  height: 20px;
+}
+
+.product_details_stone_info_tab p {
+  margin: 0;
+  color: black;
+  letter-spacing: 0;
+}
+
+.product-page-details-parent-child_1 {
+  /* width: 33%; */
+  width: fit-content;
+}
+
+.product-page-details-parent-child_2 {
+  /* width: 67%; */
+  width: fit-content;
+}
+
+.product-page-details-container .section-heading {
+  margin-top: 40px !important;
+  margin-bottom: 20px !important;
+}
+
+.product-page-details-container {
+  margin-top: 20px;
+}
+
+.product-page-details-parent {
+  display: flex;
+  position: relative;
+  flex-wrap: wrap;
+  row-gap: 10px;
+  overflow: hidden;
+}
+
+.product-page-details-parent-child {
+  display: flex;
+  justify-content: start;
+  align-items: start;
+  overflow: auto;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.product-page-details-container p {
+  margin: 0 !important;
+  color: black;
+  letter-spacing: 0;
+  font-weight: 400;
+  font-size: 1.4rem;
+}
+
+.product-page-details-list-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 100%;
+  height: fit-content;
+  margin-bottom: 15px;
+}
+
+.product-page-details-list_body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.product-page-details-list_body-product-info {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.product-page-details-list_body-product-info img {
+  width: 100%;
+  height: auto;
+}
+
+.product-page-details-list-parent {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 70px;
+}
+
+.product-page-details-list_heading {
+  margin-bottom: 10px !important;
+  font-size: 1.4rem;
+  font-weight: 500 !important;
+  line-height: 3.4rem;
+}
+
+.product-page-details-list_heading_1 {
+  margin: 10px 0 0 !important;
+  cursor: pointer;
+  color: #000;
+  font-family: Montserrat, sans-serif;
+  font-weight: 600 !important;
+  font-size: 1.6rem;
+  text-transform: uppercase;
+}
+
+.product-page-details-list_content {
+  text-align: right;
+}
+
+.product-page-details-list_header {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  align-items: center;
+}
+
+.product-page-details-list_title,
+.product-page-details-list_content {
+  font-size: 1.2rem !important;
+  font-weight: 500;
+  line-height: 2.9rem;
+}
+
+.product-page-details-list_content {
+  opacity: 0.6;
+}
+
+.product-page-details-bullet-list {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding-left: 18px;
+  list-style: disc;
+}
+
+.product-page-details-bullet-list_item {
+  font-size: 1.2rem !important;
+  font-weight: 500;
+  line-height: 2.9rem;
+}
+
+.collapsible {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease;
+}
+
+.product-page-details-list_header {
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.price-breakdown-icon {
+  transition: transform 0.3s ease;
+}
+
+.product-page-details-list_header.active .price-breakdown-icon {
+  transform: rotate(180deg);
+}
+
+@media (max-width: 1100px) {
+  .product_details_stone_info_tabs {
+    left: 6%;
+  }
+
+  .product-page-details-parent-child_1 {
+    width: 100%;
+  }
+
+  .product-page-details-parent-child_2 {
+    width: 100%;
+  }
+
+  .product-page-details-parent {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .product-page-details-list-parent {
+    gap: 100px;
+  }
+
+  .product-page-details-parent-child {
+    overflow-x: auto;
+  }
+}
+
+@media (max-width: 756px) {
+  .product-page-details-container {
+    margin-top: 30px;
+  }
+}

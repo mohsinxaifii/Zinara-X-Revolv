@@ -1,0 +1,183 @@
+<section class="page-width zinara_experience-section">
+  <div class="zinara_experience-section-inner">
+    <h2 class="home-zinara_experience-section-heading">{{ section.settings.heading }}</h2>
+    <div class="home-zinara_experience-section-blocks_container">
+      {% for block in section.blocks %}
+        <div class="home-zinara_experience-block {% if block.settings.show_button == false %} home-zinara_experience-mobile-hidden {% endif %}">
+          <img
+            src="{{ block.settings.image | image_url }}"
+            class="home-zinara_experience-block-image lazyload"
+            loading="lazy"
+            width="{{ block.settings.image.width }}"
+            height="{{ block.settings.image.height }}"
+            alt=""
+            style="aspect-ratio: {{ block.settings.image.aspect_ratio }};"
+          >
+          <h3 class="home-zinara_experience-block-heading home-zinara_experience-block-desktop_heading">
+            {{ block.settings.heading }}
+          </h3>
+          <h3 class="home-zinara_experience-block-heading home-zinara_experience-block-mobile_heading">
+            {{ block.settings.mobile_heading }}
+          </h3>
+          <p class="home-zinara_experience-block-subheading">{{ block.settings.subheading }}</p>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% if template contains 'product' %}
+  <style>
+    @media (max-width: 756px) {
+      .zinara_experience-section {
+        margin-bottom: 20px !important;
+      }
+    }
+  </style>
+{% endif %}
+
+<style>
+  .home-zinara_experience-block-mobile_heading {
+    display: none;
+    font-family: 'Montserrat', sans-serif;
+  }
+  .zinara_experience-section {
+    text-align: center;
+    margin-bottom: 60px;
+  }
+  .zinara_experience-section-inner {
+    display: flex;
+    flex-direction: column;
+    background-color: #f9f7f9;
+    padding: 50px;
+  }
+  .home-zinara_experience-section-heading {
+    font-weight: 400;
+    color: #000;
+    letter-spacing: 0 !important;
+    font-size: 2rem;
+    margin: 0 0 50px;
+  }
+  .home-zinara_experience-section-blocks_container {
+    display: flex;
+    justify-content: center;
+    align-items: start;
+    gap: 30px;
+  }
+  .home-zinara_experience-block {
+    width: 100%;
+    text-decoration: none;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  .home-zinara_experience-block-image {
+    width: auto;
+    height: 40px;
+    display: flex;
+  }
+  .home-zinara_experience-block-heading {
+    font-weight: 400;
+    letter-spacing: 0 !important;
+    font-size: 1.4rem;
+    text-decoration: none;
+    margin: 40px 0 0;
+    color: #000;
+  }
+  .home-zinara_experience-block-subheading {
+    font-size: 1rem;
+    margin: 5px 0 20px;
+    font-weight: 400;
+    text-decoration: none;
+    letter-spacing: 0 !important;
+    line-height: 1.2rem;
+    color: #000;
+  }
+  @media (max-width: 756px) {
+    .home-zinara_experience-mobile-hidden {
+      display: none;
+    }
+    .home-zinara_experience-block-mobile_heading {
+      display: flex;
+      margin-top: 20px;
+    }
+    .home-zinara_experience-block-desktop_heading {
+      display: none;
+    }
+    .home-zinara_experience-section-heading {
+      margin-bottom: 30px !important;
+    }
+    .zinara_experience-section {
+      margin-bottom: 30px !important;
+    }
+    .home-zinara_experience-section-blocks_container {
+      flex-wrap: wrap;
+    }
+    .home-zinara_experience-block {
+      width: 45%;
+    }
+    .zinara_experience-section-inner {
+      padding: 40px 15px;
+    }
+    .home-zinara_experience-block-image {
+      height: 25px;
+    }
+    .home-zinara_experience-block-subheading {
+      margin: 8px 0 0;
+      display: none;
+    }
+  }
+</style>
+{% schema %}
+{
+  "name": "Home Shop by Metal",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Section Heading",
+      "default": "Shop by Metal"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "block",
+      "name": "Metal Type",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading"
+        },
+        {
+          "type": "text",
+          "id": "mobile_heading",
+          "label": "Mobile Heading"
+        },
+        {
+          "type": "text",
+          "id": "subheading",
+          "label": "Subheading"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_button",
+          "label": "Show on mobile",
+          "default": true
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Zinara Experience Strip"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,144 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "padding_top": 28,
+        "padding_bottom": 28
+      }
+    },
+    "tah_how_it_works_wDjmf6": {
+      "type": "tah-how-it-works",
+      "settings": {
+        "heading": "How it works",
+        "image_1": "shopify://shop_images/select_tah.png",
+        "text_1": "Choose upto 10 designs to see at your home",
+        "image_2": "shopify://shop_images/human_tah.png",
+        "text_2": "A Zinara professional will bring your selected designs to the comfort of your home.",
+        "image_3": "shopify://shop_images/cart_tah.png",
+        "text_3": "If you love it, you can make the purchase on the spot."
+      }
+    },
+    "try_at_home_form_HNyDbd": {
+      "type": "try-at-home-form",
+      "settings": {
+        "collection_handle": "ready-to-ship",
+        "booking_successful_content": "Thank you for booking your trial! Our representative will call you before arriving",
+        "cta_link": "shopify://collections/ready-to-ship"
+      }
+    },
+    "collapsible_content_jyRkPa": {
+      "type": "collapsible-content",
+      "blocks": {
+        "collapsible_row_hYE4Kg": {
+          "type": "collapsible_row",
+          "settings": {
+            "heading": "What is the Try at Home service?",
+            "icon": "none",
+            "row_content": "<p>Our <em>Try at Home</em> service allows you to experience Zinara’s exquisite diamond jewellery from the comfort of your home. A Zinara professional will bring your selected designs so you can see, feel, and try them before making a purchase.</p>",
+            "page": ""
+          }
+        },
+        "collapsible_row_Akp3z3": {
+          "type": "collapsible_row",
+          "settings": {
+            "heading": "Is there any charge for the Try at Home service?",
+            "icon": "none",
+            "row_content": "<p>No, the service is absolutely free with no obligation to buy.</p>",
+            "page": ""
+          }
+        },
+        "collapsible_row_zVaYgt": {
+          "type": "collapsible_row",
+          "settings": {
+            "heading": "How many designs can I try at once?",
+            "icon": "none",
+            "row_content": "<p>You can select up to 10 designs for each appointment. We recommend choosing a mix of styles you’re curious about!</p>",
+            "page": ""
+          }
+        },
+        "collapsible_row_LcJGfQ": {
+          "type": "collapsible_row",
+          "settings": {
+            "heading": "Can I purchase the jewellery during the appointment?",
+            "icon": "none",
+            "row_content": "<p>Yes, if you love a piece, you can purchase it on the spot. Our professional will assist you with a seamless checkout experience.</p>",
+            "page": ""
+          }
+        },
+        "collapsible_row_GbMDEX": {
+          "type": "collapsible_row",
+          "settings": {
+            "heading": "Who will visit my home? Is it safe?",
+            "icon": "none",
+            "row_content": "<p>A trained and verified Zinara professional will visit your home. Your safety and comfort are our top priorities.</p>",
+            "page": ""
+          }
+        },
+        "collapsible_row_VcxFU6": {
+          "type": "collapsible_row",
+          "settings": {
+            "heading": "Can I reschedule or cancel my appointment?",
+            "icon": "none",
+            "row_content": "<p>Yes, you can reschedule or cancel your appointment easily through your confirmation link or by contacting our team.</p>",
+            "page": ""
+          }
+        },
+        "collapsible_row_R88Hmg": {
+          "type": "collapsible_row",
+          "settings": {
+            "heading": "In which cities is Try at Home currently available?",
+            "icon": "none",
+            "row_content": "<p>We currently offer this service in Delhi NCR. We’re constantly expanding, so stay tuned if your city isn’t listed yet!</p>",
+            "page": ""
+          }
+        }
+      },
+      "block_order": [
+        "collapsible_row_hYE4Kg",
+        "collapsible_row_Akp3z3",
+        "collapsible_row_zVaYgt",
+        "collapsible_row_LcJGfQ",
+        "collapsible_row_GbMDEX",
+        "collapsible_row_VcxFU6",
+        "collapsible_row_R88Hmg"
+      ],
+      "settings": {
+        "caption": "",
+        "heading": "FAQs",
+        "heading_size": "h1",
+        "heading_alignment": "center",
+        "layout": "none",
+        "color_scheme": "",
+        "container_color_scheme": "",
+        "open_first_collapsible_row": false,
+        "image_ratio": "adapt",
+        "desktop_layout": "image_second",
+        "padding_top": 36,
+        "padding_bottom": 36
+      }
+    },
+    "tah_page_heading_9frnAW": {
+      "type": "tah-page-heading",
+      "name": "TAH Page Heading",
+      "settings": {}
+    }
+  },
+  "order": [
+    "main",
+    "tah_page_heading_9frnAW",
+    "try_at_home_form_HNyDbd",
+    "tah_how_it_works_wDjmf6",
+    "collapsible_content_jyRkPa"
+  ]
+}

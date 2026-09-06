@@ -1,0 +1,54 @@
+{{ 'mobile-desktop-image.css' | asset_url | stylesheet_tag }}
+
+<div class="mobile-desktop-image-section">
+  <div class="mobile-desktop-image-container">
+    {%- if section.settings.mobile_image -%}
+      <img
+        src="{{ section.settings.mobile_image | image_url: width: 500 }}"
+        alt="{{ section.settings.mobile_image.alt }}"
+        class="mobile-desktop-image mobile-image"
+        loading="lazy"
+      >
+    {%- endif -%}
+
+    {%- if section.settings.desktop_image -%}
+      <img
+        src="{{ section.settings.desktop_image | image_url: width: 1200 }}"
+        alt="{{ section.settings.desktop_image.alt }}"
+        class="mobile-desktop-image desktop-image"
+        loading="lazy"
+      >
+    {%- endif -%}
+  </div>
+</div>
+{% if section.settings.mobile_image != null %}
+  <style>
+    @media (max-width: 756px) {
+      .facets-wrapper {
+        top:  600px !important;
+      }
+    }
+  </style>
+{% endif %}
+{% schema %}
+{
+  "name": "Mobile Desktop Image",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "mobile_image",
+      "label": "Mobile Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "desktop_image",
+      "label": "Desktop Image"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Mobile Desktop Image"
+    }
+  ]
+}
+{% endschema %}

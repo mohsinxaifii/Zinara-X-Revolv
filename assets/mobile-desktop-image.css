@@ -1,0 +1,33 @@
+.mobile-desktop-image-section {
+  width: 100%;
+}
+
+.mobile-desktop-image-container {
+  width: 100%;
+  overflow: hidden;
+}
+
+.mobile-desktop-image {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.mobile-image {
+  display: block;
+  height: 424px;
+}
+
+.desktop-image {
+  display: none;
+}
+
+@media screen and (min-width: 769px) {
+  .mobile-image {
+    display: none;
+  }
+
+  .desktop-image {
+    display: block;
+  }
+}

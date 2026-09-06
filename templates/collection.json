@@ -1,0 +1,129 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "banner": {
+      "type": "main-collection-banner",
+      "settings": {
+        "show_collection_description": false,
+        "show_collection_image": true,
+        "color_scheme": "scheme-1"
+      }
+    },
+    "mobile_desktop_image_tpL8ja": {
+      "type": "mobile-desktop-image",
+      "name": "Mobile Desktop Image",
+      "settings": {
+        "mobile_image": "{{ collection.metafields.custom.main_image_mobile.value }}",
+        "desktop_image": "{{ collection.metafields.custom.main_image_desktop.value }}"
+      }
+    },
+    "product-grid": {
+      "type": "main-collection-product-grid",
+      "custom_css": [
+        ".product-grid-image,.card__media,.product-card__image {background-color: #ffffff !important;}"
+      ],
+      "settings": {
+        "products_per_page": 51,
+        "columns_desktop": 3,
+        "color_scheme": "scheme-df6532fc-b063-435e-9039-25f6aece7c28",
+        "image_ratio": "square",
+        "image_shape": "default",
+        "show_secondary_image": true,
+        "show_vendor": false,
+        "show_rating": false,
+        "quick_add": "none",
+        "enable_filtering": true,
+        "filter_type": "vertical",
+        "enable_sorting": true,
+        "columns_mobile": "2",
+        "padding_top": 36,
+        "padding_bottom": 36
+      }
+    },
+    "collapsible_content_nLnX9P": {
+      "type": "collapsible-content",
+      "blocks": {
+        "collapsible_row_fa6hEp": {
+          "type": "collapsible_row",
+          "settings": {
+            "heading": "Are Zinara lab grown diamonds graded and certified?",
+            "icon": "none",
+            "row_content": "<p>Yes, lab grown diamonds are graded and certified by the same gemological laboratories that evaluate natural diamonds. Renowned organizations like GIA, IGI, and SGL provide these certifications. The grading process for lab grown diamonds is identical to that for natural diamonds, ensuring transparency and quality assurance. All lab grown diamonds used in jewellery offered by ZINARA are graded and certified by these laboratory organizations.</p>",
+            "page": ""
+          }
+        },
+        "collapsible_row_MUnAgU": {
+          "type": "collapsible_row",
+          "settings": {
+            "heading": "Does Zinara deliver pan-India?",
+            "icon": "none",
+            "row_content": "<p>Currently, we deliver to select cities within India. To check if we deliver to your area, please enter your pincode or city on the product page. We apologize if delivery services are unavailable in your region. Be assured, we’re working to get our services in our city as well.</p>",
+            "page": ""
+          }
+        },
+        "collapsible_row_KgCLYw": {
+          "type": "collapsible_row",
+          "settings": {
+            "heading": "Are there shipping charges?",
+            "icon": "none",
+            "row_content": "<p>Shipping within India is free. For details on return shipping charges, please refer to the<strong>Shipping Policy </strong>section.</p>",
+            "page": ""
+          }
+        },
+        "collapsible_row_g7PpD3": {
+          "type": "collapsible_row",
+          "settings": {
+            "heading": "What payment options are available?",
+            "icon": "none",
+            "row_content": "<p>Payment methods include credit cards, debit cards, net banking, international cards, and cash on delivery.</p>",
+            "page": ""
+          }
+        },
+        "collapsible_row_b98YYX": {
+          "type": "collapsible_row",
+          "settings": {
+            "heading": "What’s a home trial?",
+            "icon": "none",
+            "row_content": "<p>We bring upto 10 preselected designs to your location (Delhi NCR only). Try them on, get opinions, and buy only what you love. No pressure, just pretty things.</p>",
+            "page": ""
+          }
+        }
+      },
+      "block_order": [
+        "collapsible_row_fa6hEp",
+        "collapsible_row_MUnAgU",
+        "collapsible_row_KgCLYw",
+        "collapsible_row_g7PpD3",
+        "collapsible_row_b98YYX"
+      ],
+      "settings": {
+        "caption": "",
+        "heading": "FAQs",
+        "heading_size": "h1",
+        "heading_alignment": "left",
+        "layout": "none",
+        "color_scheme": "",
+        "container_color_scheme": "",
+        "open_first_collapsible_row": false,
+        "image_ratio": "adapt",
+        "desktop_layout": "image_second",
+        "padding_top": 0,
+        "padding_bottom": 36
+      }
+    }
+  },
+  "order": [
+    "banner",
+    "mobile_desktop_image_tpL8ja",
+    "product-grid",
+    "collapsible_content_nLnX9P"
+  ]
+}

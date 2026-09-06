@@ -1,0 +1,251 @@
+.mobile-filter-row-item {
+    display: none;
+    gap: 7px;
+    align-items: center;
+    background: #f2eeeb;
+    padding: 8px 11px;
+    height: fit-content;
+}
+
+.mobile-filter-row-item img {
+    width: 21px;
+    height: auto;
+}
+
+.mobile-filter-row-item p {
+    color: #610C27;
+    text-wrap: nowrap !important;
+    font-size: 1.4rem;
+    letter-spacing: 0;
+    margin: 0;
+    font-family: "Montserrat", sans-serif;
+    font-weight: 700;
+}
+
+/* Filter and Sort Asides */
+.filter-aside-container {
+    position: fixed;
+    background: #f8f7f9;
+    width: 100vw !important;
+    height: -webkit-fill-available !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease-in-out;
+    z-index: 2000;
+    top: 0;
+    bottom: 0;
+    padding: 0 15px;
+    transform: translateX(-154%);
+    display: flex;
+    flex-direction: row;
+}
+
+.sort-aside-container {
+    position: fixed;
+    background: #f8f7f9;
+    bottom: 0;
+    left: 0;
+    transform: translateY(100%);
+    width: 100% !important;
+    max-width: none;
+    height: auto;
+    transition: all ease-in .3s;
+    padding: 20px;
+    z-index: 2;
+}
+
+.sort-aside-container.active {
+    transform: translateX(0);
+    transform: translateY(0);
+}
+
+.filter-aside-container.active {
+    transform: translateX(-4%);
+}
+
+/* Close Buttons */
+.sort-aside-close-btn {
+    background: none;
+    border: none;
+    font-size: 4rem;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+    z-index: 2100;
+    color: #610C27;
+}
+
+.filter-aside-close-btn {
+    background: none;
+    border: none;
+    font-size: 4rem;
+    position: absolute;
+    top: 80px;
+    right: 10px;
+    cursor: pointer;
+    z-index: 2100;
+    color: #610C27;
+}
+
+/* Headings */
+.sort-aside-heading {
+    font-family: var(--font-heading-family);
+    font-size: 2.5rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.filter-aside-heading {
+    margin: 70px 0 30px;
+    font-family: var(--font-heading-family);
+    font-size: 2.5rem;
+    font-weight: 600;
+}
+
+/* Overlay */
+.filter-sort-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    display: none;
+}
+
+.filter-sort-overlay.active {
+    display: block;
+}
+
+
+
+
+
+.filter-labels {
+    flex: 1;
+    min-width: 40%;
+    background-color: #f8f8f8;
+    padding: 1rem 0 0;
+    overflow-y: auto;
+}
+
+.filter-label-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.filter-label-button {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    padding: 0 1rem 2rem 0;
+    cursor: pointer;
+    font-size: 1.65rem;
+    color: #000;
+    letter-spacing: 0;
+    font-weight: 500;
+    font-family: "Montserrat", sans-serif;
+}
+
+.filter-label-button[aria-selected="true"] {
+    font-weight: 700;
+    color: #610c27;
+}
+
+.filter-content {
+    height: 100%;
+    flex: 3;
+    background-color: #f2eeeb;
+    width: 47%;
+    margin: 142px 0 0;
+    overflow-y: auto;
+    padding: 12px 33px 0 15px;
+}
+
+.filter-content fieldset svg {
+    display: none;
+}
+
+.filter-panel {
+    display: none;
+}
+
+.filter-panel fieldset {
+    padding: 0;
+    margin: 10px 0 0;
+    border: 0;
+}
+
+.filter-panel[aria-hidden="false"] {
+    display: block;
+}
+
+.sort-aside-list {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    list-style: none;
+    padding: 0;
+    margin-top: 3.2rem;
+    margin-bottom: 0;
+    gap: 15px;
+}
+
+.sort-aside-item {
+    text-decoration: none;
+    font-size: 1.9rem;
+    font-family: "Montserrat", sans-serif;
+    font-weight: 500;
+}
+
+.sort-aside-item.active {
+    color: #610C27;
+}
+
+.mobile-coll-filters-bottom-buttons {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background: #f8f7f9;
+}
+
+.mobile-coll-filters-bottom-buttons #bottom-buton-1 {
+    color: #610C27;
+    border: solid 1px #610C27;
+    background: transparent;
+    padding: 8px;
+    width: 49%;
+    font-family: "Montserrat", sans-serif;
+    font-size: 1.7rem;
+    font-weight: 500;
+    text-decoration: none;
+    text-align: center;
+}
+
+.mobile-coll-filters-bottom-buttons #bottom-buton-2 {
+    color: #fff;
+    border: none;
+    background: #610C27;
+    padding: 8px;
+    width: 49%;
+    font-family: "Montserrat", sans-serif;
+    font-size: 1.7rem;
+    font-weight: 500;
+    text-decoration: none;
+    text-align: center;
+}
+
+@media(max-width:756px) {
+    .mobile-filter-row-item {
+        display: flex;
+    }
+}

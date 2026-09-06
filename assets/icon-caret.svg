@@ -1,0 +1,10 @@
+<svg class="icon icon-caret" viewBox="-2 -2 13 10" style="color: #610c27;">
+    <path 
+      fill="currentColor" 
+      stroke="currentColor" 
+      stroke-width="2" 
+      d="M9.354.646a.5.5 0 0 0-.708 0L5 4.293 1.354.646a.5.5 0 0 0-.708.708l4 4a.5.5 0 0 0 .708 0l4-4a.5.5 0 0 0 0-.708" 
+      clip-rule="evenodd">
+    </path>
+  </svg>
+  

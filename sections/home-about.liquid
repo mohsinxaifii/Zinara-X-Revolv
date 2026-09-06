@@ -1,0 +1,136 @@
+<section class="page-width home-about-us-container">
+  <h2 class="section-heading">{{ section.settings.heading }}</h2>
+  <div class="home-about-us">
+    <div class="home-about-us-left">
+      <img src="{{ section.settings.image | image_url }}" class="large-image">
+      <img class="home-about-us-left_small_image" src="{{ section.settings.image_2 | image_url }}">
+      <img class="home-about-us-left_small_image" src="{{ section.settings.image_3 | image_url }}">
+    </div>
+    <div class="home-about-us-right">
+      <p>{{ section.settings.content }}</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .home-about-us {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+  }
+  .home-about-us-left {
+    width: 45%;
+    gap: 2%;
+    align-items: end;
+    display: flex;
+  }
+  .home-about-us-left img {
+    transition: all 0.3s ease-in;
+    cursor: pointer;
+  }
+  .home-about-us-left img.large-image {
+    width: 60%;
+    border-radius: 20px 0 20px 0;
+  }
+  .home-about-us-left img:not(.large-image) {
+    width: 15%;
+    height: fit-content;
+    border-radius: 15px 0 15px 0;
+    aspect-ratio: 80 / 108;
+  }
+  .home-about-us-right {
+    width: 50%;
+  }
+  .home-about-us p {
+    font-size: 1.6rem;
+    margin: 0;
+    letter-spacing: 0;
+    font-weight: 400;
+    line-height: 2.5rem;
+  }
+
+  @media (max-width: 756px) {
+    /* .home-about-us-left img {
+      width: 100% !important;
+    } */
+    .home-about-us p {
+      font-size: 1.4rem;
+      margin: 0;
+      letter-spacing: 0;
+      font-weight: 400;
+      line-height: 1.5rem;
+    }
+  }
+</style>
+
+<script>
+  function initializeImageClickListener() {
+    const images = document.querySelectorAll('.home-about-us-left img');
+
+    images.forEach((img) => {
+      img.addEventListener('click', function () {
+        // Remove the 'large-image' class from all images
+        images.forEach((img) => img.classList.remove('large-image'));
+
+        // Add the 'large-image' class to the clicked image
+        this.classList.add('large-image');
+      });
+    });
+  }
+
+  function handleResize() {
+    const viewportWidth = window.innerWidth;
+
+    if (viewportWidth > 756) {
+      initializeImageClickListener();
+    } else {
+      // Remove large-image class for smaller screens
+      const images = document.querySelectorAll('.home-about-us-left img');
+      images.forEach((img) => img.classList.add('large-image'));
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', handleResize);
+  window.addEventListener('resize', handleResize);
+</script>
+
+{% schema %}
+{
+  "name": "Home About Us",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Section Heading",
+      "default": "About Us"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_2",
+      "label": "Image 2"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_3",
+      "label": "Image 3"
+    },
+    {
+      "type": "text",
+      "id": "content",
+      "label": "Content",
+      "default": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur cursus justo sed urna finibus fermentum. Fusce vestibulum sollicitudin felis, at ultricies leo semper at. Nunc volutpat auctor varius. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur cursus justo sed urna finibus fermentum. Fusce vestibulum sollicitudin felis, at ultricies leo semper at. Nunc volutpat auctor varius."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Home About Us",
+      "category": "Custom"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,473 @@
+<div class="page-width tah-content-header_helpline-container">
+  <div>
+    <div>
+      <img src="https://cdn.shopify.com/s/files/1/0661/8336/4792/files/Expand_Arrow_2.png?v=1745235024">
+      {% if page.handle == 'try-at-home' %}
+        <p>Try at Home</p>
+      {% elsif page.handle == 'video-trial' %}
+        <p>Video Trial</p>
+      {% endif %}
+    </div>
+    <a class="changepincode"> <span id="pincode-display"></span> | Change Pincode </a>
+  </div>
+  <div>
+    <script>
+      // Wait for the DOM to load
+      document.addEventListener('DOMContentLoaded', () => {
+        // Safely access and display the global variable
+        document.getElementById('pincode-display').textContent = `${window.globalTryAtHomePincode || 'Not Set'}`;
+      });
+    </script>
+
+    <img src="https://cdn.shopify.com/s/files/1/0661/8336/4792/files/Filter_Icon_Container.png?v=1745235101">
+  </div>
+</div>
+{% comment %} Change Pinncode Start {% endcomment %}
+<div id="tryAtHomeOverlay_4" class="try-at-home-overlay" style="display: none;">
+  <div id="tryAtHomePincodePopup_4" class="try-at-home-pincode-popup">
+    <button id="tryAtHomeClose_4" class="try-at-home-close-btn">&times;</button>
+    <h3 class="try-at-home-title">Enter pincode to check availability</h3>
+    <p class="pincode_check_popup_content">{{ settings.try_at_home_text }}</p>
+    <input
+      id="tryAtHomeZipcode_4"
+      type="text"
+      class="try-at-home-pincode-input"
+      placeholder="Pincode"
+      maxlength="6"
+    >
+    <button
+      id="tryAtHomeSubmitBtn_4"
+      type="submit"
+      class="try-at-home-pincode-button"
+    >
+      Check Availability
+    </button>
+    <div id="tryAtHomeRes_4" class="try-at-home-pincode-result"></div>
+  </div>
+</div>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const overlay = document.getElementById('tryAtHomeOverlay_4');
+    const pincodePopup = document.getElementById('tryAtHomePincodePopup_4');
+    const closeButton = document.getElementById('tryAtHomeClose_4');
+    const submitButton = document.getElementById('tryAtHomeSubmitBtn_4');
+    const zipcodeInput = document.getElementById('tryAtHomeZipcode_4');
+    const res = document.getElementById('tryAtHomeRes_4');
+    const changePincodeLink = document.querySelector('.changepincode');
+
+    // Function to check if the customer is logged in
+    function isLoggedIn() {
+      return {% if customer %}true{% else %}false{% endif %};
+    }
+
+    const validPincodes = ['110001', '110002',
+            '110003',
+            '110004',
+            '110005',
+            '110006',
+            '110007',
+            '110008',
+            '110009',
+            '110010',
+            '110011',
+            '110012',
+            '110013',
+            '110014',
+            '110015',
+            '110016',
+            '110017',
+            '110018',
+            '110019',
+            '110020',
+            '110021',
+            '110022',
+            '110023',
+            '110024',
+            '110025',
+            '110026',
+            '110027',
+            '110028',
+            '110029',
+            '110030',
+            '110031',
+            '110032',
+            '110033',
+            '110034',
+            '110035',
+            '110036',
+            '110037',
+            '110038',
+            '110039',
+            '110040',
+            '110041',
+            '110042',
+            '110043',
+            '110044',
+            '110045',
+            '110046',
+            '110047',
+            '110048',
+            '110049',
+            '110051',
+            '110052',
+            '110053',
+            '110054',
+            '110055',
+            '110056',
+            '110057',
+            '110058',
+            '110059',
+            '110060',
+            '110061',
+            '110062',
+            '110063',
+            '110064',
+            '110065',
+            '110066',
+            '110067',
+            '110068',
+            '110069',
+            '110070',
+            '110071',
+            '110072',
+            '110073',
+            '110074',
+            '110075',
+            '110076',
+            '110077',
+            '110078',
+            '110080',
+            '110081',
+            '110082',
+            '110083',
+            '110084',
+            '110085',
+            '110086',
+            '110087',
+            '110088',
+            '110089',
+            '110090',
+            '110091',
+            '110092',
+            '110093',
+            '110094',
+            '110095',
+            '110096',
+            '110097',
+            '110099',
+            '110110',
+            '122001',
+            '122002',
+            '122003',
+            '122004',
+            '122005',
+            '122006',
+            '122007',
+            '122008',
+            '122009',
+            '122010',
+            '122011',
+            '122012',
+            '122015',
+            '122016',
+            '122017',
+            '122018',
+            '122022',
+            '122051',
+            '122052',
+            '122098',
+            '122101',
+            '122102',
+            '122505',
+            '201020',
+            '201021',
+            '201103',
+            '201301',
+            '201303',
+            '201305',
+            '201306',
+            '201307',
+            '201308',
+            '201309',
+            '201310',
+            '201311',
+            '201312',
+            '201313',
+            '201315',
+            '201316',
+            '201317',
+            '201318',
+            '121001',
+            '121002',
+            '121003',
+            '121005',
+            '121006',
+            '121007',
+            '121008',
+            '121009',
+            '121010',
+            '121012',
+            '121013',
+            '121014',
+            '121015',
+            '121101',
+            '201001',
+            '201002',
+            '201003',
+            '201004',
+            '201005',
+            '201006',
+            '201007',
+            '201009',
+            '201010',
+            '201011',
+            '201012',
+            '201013',
+            '201014',
+            '201016',
+            '201017',
+            '201019',
+            '201102',
+            '201302',
+            '201304',]; // Example valid pincodes
+
+    // Function to toggle the popup visibility
+    function togglePopup(show) {
+      overlay.style.display = show ? 'flex' : 'none';
+    }
+
+    // Function to handle direct redirect based on pincode
+    function handleDirectRedirect(zipcode) {
+      const tryAtHomeUrl = `/pages/try-at-home?view=try-at-home&product_handle={{ product.handle }}`;
+      const videoTrialUrl = `/pages/video-trial?view=video-trial&product_handle={{ product.handle }}`;
+
+      if (!isLoggedIn()) {
+        const targetUrl = validPincodes.includes(zipcode) ? tryAtHomeUrl : videoTrialUrl;
+        const loginUrl = `/account/login?return_url=${encodeURIComponent(targetUrl)}&kp_login=true&kp_redirect=${encodeURIComponent(targetUrl)}`;
+        window.location.href = loginUrl;
+        return;
+      }
+
+      if (validPincodes.includes(zipcode)) {
+        res.textContent = 'Available';
+        res.className = 'try-at-home-pincode-result available';
+        window.location.href = tryAtHomeUrl;
+      } else {
+        res.textContent = 'Pincode Not Available';
+        res.className = 'try-at-home-pincode-result unavailable';
+        window.location.href = videoTrialUrl;
+      }
+    }
+
+    // Handle pincode validation and availability check
+    function handlePincodeCheck() {
+      submitButton.addEventListener('click', () => {
+        const zipcode = zipcodeInput.value.trim();
+        const pincodeRegex = /^[1-9][0-9]{5}$/;
+
+        if (!pincodeRegex.test(zipcode)) {
+          res.textContent = 'Invalid Pincode';
+          res.className = 'try-at-home-pincode-result invalid';
+          return;
+        }
+
+        localStorage.setItem('user_tryathomepincode', zipcode);
+        handleDirectRedirect(zipcode);
+      });
+    }
+
+    // Open popup on clicking "Change Pincode"
+    changePincodeLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      togglePopup(true);
+    });
+
+    // Close popup when close button is clicked
+    closeButton.addEventListener('click', () => {
+      togglePopup(false);
+    });
+
+    // Close popup when clicking outside the popup
+    overlay.addEventListener('click', (e) => {
+      if (!pincodePopup.contains(e.target)) {
+        togglePopup(false);
+      }
+    });
+
+    // Only allow digits in input
+    zipcodeInput.addEventListener('input', (event) => {
+      event.target.value = event.target.value.replace(/[^0-9]/g, '');
+    });
+
+    // Initialize pincode check
+    handlePincodeCheck();
+  });
+</script>
+
+<style>
+  /* Overlay and background blur */
+  .try-at-home-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(8px);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  .try-at-home-grid-cta-mobile,
+  .try-at-home-grid-cta-desktop {
+    cursor: pointer !important;
+  }
+  .try-at-home-grid-cta-mobile {
+    display: none !important;
+  }
+  .try-at-home-grid-cta-desktop {
+    display: flex !important;
+    margin-top: 20px !important;
+    width: 100%;
+  }
+  /* Popup container */
+  .try-at-home-pincode-popup {
+    position: relative;
+    background: #f4eeeb;
+    padding: 30px 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    max-width: 415px;
+    width: 90%;
+  }
+
+  /* Close button */
+  .try-at-home-close-btn {
+    position: absolute;
+    top: 37px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 4rem;
+    cursor: pointer;
+    font-weight: 500;
+    font-family: 'Montserrat', sans-serif;
+    line-height: 0;
+    color: #712242;
+  }
+
+  /* Title */
+  .try-at-home-title {
+    font-size: 2rem;
+    margin: 0;
+    font-weight: 500;
+    font-family: var(--font-heading-family);
+    text-align: left;
+  }
+
+  /* Input field */
+  .try-at-home-pincode-input {
+    border: none;
+    color: #712242;
+    font-size: 1.6rem;
+    letter-spacing: 0;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    width: 100%;
+    margin: 19px 0;
+    padding: 9px;
+    background: transparent;
+    border-bottom: solid 1px #71224230;
+  }
+
+  /* Remove up and down arrows from number inputs */
+  .try-at-home-pincode-input[type='text']::-webkit-inner-spin-button,
+  .try-at-home-pincode-input[type='text']::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  .try-at-home-pincode-input[type='text'] {
+    -moz-appearance: textfield; /* For Firefox */
+  }
+
+  .try-at-home-pincode-input::placeholder {
+    color: #71224280;
+    font-size: 1.6rem;
+  }
+
+  /* Submit button */
+  .try-at-home-pincode-button {
+    background: #712242;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    font-size: 1.6rem;
+    cursor: pointer;
+    width: 100%;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+  }
+
+  .try-at-home-pincode-button:hover {
+    background: #71224260;
+  }
+
+  /* Result messages */
+  .try-at-home-pincode-result {
+    margin-top: 10px;
+    font-size: 14px;
+  }
+
+  .try-at-home-pincode-result.invalid {
+    color: red;
+  }
+
+  .try-at-home-pincode-result.available {
+    color: green;
+  }
+
+  .try-at-home-pincode-result.unavailable {
+    color: orange;
+  }
+  @media (max-width: 756px) {
+    .try-at-home-grid-cta-mobile {
+      display: flex !important;
+    }
+    .try-at-home-grid-cta-desktop {
+      display: none !important;
+    }
+  }
+</style>
+{% comment %} Change Pincode End {% endcomment %}
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const images = document.querySelectorAll('.tah-content-header_helpline-container img');
+
+    if (images.length > 0) {
+      // Handle the first image click (Go back)
+      images[0].addEventListener('click', () => {
+        window.history.back(); // Navigate to the previous page
+      });
+
+      // Handle the second image click (Dial phone number)
+      if (images[1]) {
+        images[1].addEventListener('click', () => {
+          window.location.href = 'tel:8851812814'; // Dial the phone number
+        });
+      }
+    }
+  });
+</script>
+{% schema %}
+{
+  "name": "TAH Page Heading",
+  "presets": [
+    {
+      "name": "TAH Page Heading"
+    }
+  ]
+}
+{% endschema %}

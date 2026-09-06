@@ -1,0 +1,111 @@
+.home-zinara-collections__container {
+  background-color: #f5e1e5;
+  padding-top: 50px;
+  padding-bottom: 50px;
+  margin-bottom: 30px;
+}
+
+.home-zinara-collections__container h2 {
+  font-weight: 600;
+  color: #000;
+  letter-spacing: 0 !important;
+  font-size: 2rem;
+  margin: 0 0 50px;
+  text-align: center;
+}
+
+.zinara-collection_container {
+  display: flex;
+  margin-top: 30px;
+  gap: 3.5%;
+  flex-wrap: wrap;
+  justify-content: center;
+  row-gap: 25px;
+}
+
+.zinara-collection_mobile-image {
+  display: none;
+  box-shadow: 0px 2px 9px rgba(0, 0, 0, 0.4);
+}
+
+.zinara-collection_link img {
+  box-shadow: 0px 2px 9px rgba(0, 0, 0, 0.4);
+  aspect-ratio: 218 / 290;
+  height: auto;
+  object-fit: cover;
+  width: 100%;
+  border-radius: 30px;
+}
+
+.zinara-collection_link:nth-child(even) img {
+  aspect-ratio: 218 / 218;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+.zinara-collection_link {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 0;
+  aspect-ratio: 218 / 290;
+  width: 17.2%;
+}
+
+/* Mobile: 2 columns */
+@media (max-width: 768px) {
+  .zinara-collection_container {
+    row-gap: 30px;
+    column-gap: 6%;
+  }
+
+  .home-zinara-collections__container {
+    margin-top: 50px;
+    padding-top: 30px;
+    padding-bottom: 30px;
+    margin-bottom: 10px;
+  }
+
+  .zinara-collection_link {
+    width: 47%;
+  }
+
+  .home-zinara-collections__container h3 {
+    font-size: 1.5rem !important;
+  }
+
+  .zinara-collection_mobile-image {
+    display: block;
+  }
+
+  .zinara-collection_image {
+    display: none;
+  }
+
+  .zinara-collection_link img {
+    aspect-ratio: 160 / 213;
+  }
+
+  .zinara-collection_link:nth-child(even) img {
+    aspect-ratio: 160 / 160;
+  }
+
+  .home-zinara-collections__container h2 {
+    margin-bottom: 30px;
+  }
+}
+
+.home-zinara-collections__container h3 {
+  font-family: var(--font-body-family);
+  font-weight: 600;
+  font-size: 1.6rem;
+  text-align: center;
+  margin-bottom: 0;
+  letter-spacing: 0;
+}
+
+.home-zinara-collections__container a {
+  text-decoration: none;
+}

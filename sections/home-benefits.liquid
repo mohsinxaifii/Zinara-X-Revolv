@@ -1,0 +1,217 @@
+<section class="home-benefits-container-parent">
+  <div class="page-width section_heading_with_button">
+    <h2 class="section-heading">{{ section.settings.heading }}</h2>
+    {% comment %} <p>View All</p> {% endcomment %}
+  </div>
+  <div class="home-benefits-container">
+    {% for block in section.blocks %}
+      <div class="zinara-benefits-content" id="{{ block.id }}">
+        <img src="{{ block.settings.image | img_url: 'medium' }}" alt="{{ block.settings.text }}">
+        <p>{{ block.settings.text }}</p>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // console.log('DOM fully loaded.');
+
+    const isProductsPage = document.body.classList.contains('template-product');
+    const viewportWidth = window.innerWidth;
+
+    // console.log('Is Products Page:', isProductsPage);
+    // console.log('Viewport Width:', viewportWidth);
+
+    // This condition is the key: skip only if product page + mobile.
+    if (!(isProductsPage && viewportWidth <= 756)) {
+      // console.log('✅ Animation allowed. Preparing...');
+
+      const benefitsContainer = document.querySelector('.home-benefits-container');
+
+      if (!benefitsContainer) {
+        // console.log('❌ Benefits container not found.');
+        return;
+      }
+
+      // console.log('✅ Benefits container found.');
+
+      const images = benefitsContainer.querySelectorAll('img');
+      let loadedImages = 0;
+
+      // console.log(`🖼️ Found ${images.length} images.`);
+
+      if (images.length === 0) {
+        // console.log('⚠️ No images found, starting animation immediately.');
+        startAnimation();
+      } else {
+        images.forEach((img) => {
+          if (img.complete) {
+            loadedImages++;
+            // console.log(`✅ Image already loaded (${loadedImages}/${images.length})`);
+            if (loadedImages === images.length) {
+              startAnimation();
+            }
+          } else {
+            img.addEventListener('load', () => {
+              loadedImages++;
+              // console.log(`✅ Image loaded (${loadedImages}/${images.length})`);
+              if (loadedImages === images.length) {
+                startAnimation();
+              }
+            });
+            img.addEventListener('error', () => {
+              loadedImages++;
+              // console.log(`⚠️ Image failed to load (${loadedImages}/${images.length})`);
+              if (loadedImages === images.length) {
+                startAnimation();
+              }
+            });
+          }
+        });
+      }
+
+      function startAnimation() {
+        // console.log('🚀 Starting animation...');
+
+        const blocks = benefitsContainer.innerHTML;
+        benefitsContainer.innerHTML += blocks;
+
+        const totalWidth = benefitsContainer.scrollWidth / 2;
+
+        // console.log('Total Scroll Width (half):', totalWidth);
+
+        if (totalWidth > 0) {
+          gsap.to('.home-benefits-container', {
+            x: `-${totalWidth}px`,
+            ease: 'none',
+            duration: 30,
+            repeat: -1,
+          });
+          // console.log('✅ GSAP animation started.');
+        } else {
+          // console.log('❌ totalWidth is 0 — animation skipped.');
+        }
+      }
+    } else {
+      // console.log('💡 Animation skipped: Product page on mobile device.');
+    }
+  });
+</script>
+<style>
+  .home-benefits-container {
+    display: flex;
+    gap: 20px; /* Ensures consistent spacing between items */
+    align-items: center;
+    width: 100%; /* Full width for the scrolling container */
+  }
+
+  .zinara-benefits-content {
+    min-width: 180px; /* Ensures each block takes up 17% of the container width */
+    width: 180px; /* Ensures each block takes up 17% of the container width */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
+
+  .zinara-benefits-content img {
+    width: 35%;
+    height: auto;
+    aspect-ratio: 1/1;
+    display: block;
+    border-radius: 0; /* Keeps image styling consistent */
+  }
+
+  .zinara-benefits-content p {
+    margin-top: 10px; /* Simplifies margin shorthand */
+    font-weight: 600;
+    line-height: 2rem;
+    font-size: 1.2rem;
+    letter-spacing: 0;
+  }
+
+  .section_heading_with_button {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .home-benefits-container-parent {
+    overflow: hidden; /* Hides overflow for seamless scrolling */
+    margin-top: 50px;
+  }
+
+  .section_heading_with_button p {
+    color: #610c27;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  @media (max-width: 756px) {
+    .zinara-benefits-content {
+      width: 100px;
+      min-width: 100px;
+    }
+
+    .zinara-benefits-content img {
+      width: 50%; /* Larger image size for better visibility on mobile */
+    }
+
+    .zinara-benefits-content p {
+      font-size: 1rem; /* Slightly smaller text for better fit */
+    }
+
+    .section_heading_with_button {
+      flex-direction: column; /* Adjust layout for smaller screens */
+      align-items: flex-start;
+    }
+  }
+</style>
+{% if template == 'product' %}
+  <style>
+    @media (max-width: 756px) {
+      .zinara-benefits-content {
+        min-width: fit-content !important;
+        margin: 20px 0 0;
+      }
+    }
+  </style>
+{% endif %}
+{% schema %}
+{
+  "name": "Zinara Benefits",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Section Heading",
+      "default": "Zinara Benefits"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "tab",
+      "name": "Category Tab",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "Occasion"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Zinara Benefits"
+    }
+  ]
+}
+{% endschema %}

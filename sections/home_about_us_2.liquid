@@ -1,0 +1,90 @@
+<section class="page-width home-about-us_2-container">
+  <h2 class="section-heading">{{ section.settings.heading }}</h2>
+  <div class="home-about-us_2">
+    <div class="home-about-us_2-left">
+      <img src="{{ section.settings.image | image_url }}">
+    </div>
+    <div class="home-about-us_2-right">
+      <p>{{ section.settings.content }}</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .home-about-us_2 {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .home-about-us_2-left {
+    width: 47%;
+    align-items: end;
+    display: flex;
+  }
+  .home-about-us_2-left img {
+    transition: all 0.3s ease-in;
+    cursor: pointer;
+    width: 100%;
+  }
+  .home-about-us_2-right {
+    width: 50%;
+  }
+  .home-about-us_2 p {
+    font-size: 1.4rem;
+    margin: 0;
+    color: #000;
+    letter-spacing: 0;
+    font-weight: 400;
+    line-height: 2.5rem;
+  }
+
+  @media (max-width: 756px) {
+    /* .home-about-us_2-left img {
+      width: 100% !important;
+    } */
+    .home-about-us_2 {
+      flex-direction: column;
+      gap: 20px;
+    }
+    .home-about-us_2-left {
+      width: 100%;
+    }
+    .home-about-us_2 p {
+      margin: 0;
+    }
+    .home-about-us_2-right {
+      width: 100%;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Home About Us 2",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Section Heading",
+      "default": "About Us"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "content",
+      "label": "Content",
+      "default": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur cursus justo sed urna finibus fermentum. Fusce vestibulum sollicitudin felis, at ultricies leo semper at. Nunc volutpat auctor varius. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur cursus justo sed urna finibus fermentum. Fusce vestibulum sollicitudin felis, at ultricies leo semper at. Nunc volutpat auctor varius."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Home About Us 2",
+      "category": "Custom"
+    }
+  ]
+}
+{% endschema %}

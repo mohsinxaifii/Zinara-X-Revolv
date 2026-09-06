@@ -1,0 +1,2023 @@
+<!doctype html>
+<html class="js" lang="{{ request.locale.iso_code }}">
+  <head>
+<!-- Gokwik theme code start -->
+<link rel="dns-prefetch" href="https://pdp.gokwik.co/">
+<link rel="dns-prefetch" href="https://api.gokwik.co">
+{% render 'gokwik' %}
+<!-- Gokwik theme code End -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="theme-color" content="">
+    <link rel="canonical" href="{{ canonical_url }}">
+    <!-- Google Tag Manager -->
+    <script>
+      (function (w, d, s, l, i) {
+        w[l] = w[l] || [];
+        w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
+        var f = d.getElementsByTagName(s)[0],
+          j = d.createElement(s),
+          dl = l != 'dataLayer' ? '&l=' + l : '';
+        j.async = true;
+        j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+        f.parentNode.insertBefore(j, f);
+      })(window, document, 'script', 'dataLayer', 'GTM-PBW8CRH3');
+    </script>
+    <!-- End Google Tag Manager -->
+
+    {%- if settings.favicon != blank -%}
+      <link
+        rel="icon"
+        type="image/png"
+        href="{{ settings.favicon | image_url: width: 32, height: 32 }}"
+      >
+    {%- endif -%}
+
+    {%- unless settings.type_header_font.system? and settings.type_body_font.system? -%}
+      <link
+        rel="preconnect"
+        href="https://fonts.shopifycdn.com"
+        crossorigin
+      >
+    {%- endunless -%}
+
+    <title>
+      {{ page_title }}
+      {%- if current_tags %}
+        &ndash; tagged "{{ current_tags | join: ', ' }}"
+      {%- endif -%}
+      {%- if current_page != 1 %}
+        &ndash; Page {{ current_page -}}
+      {%- endif -%}
+      {%- unless page_title contains shop.name %}
+        &ndash; {{ shop.name -}}
+      {%- endunless -%}
+    </title>
+
+    {% if page_description %}
+      <meta name="description" content="{{ page_description | escape }}">
+    {% endif %}
+
+    {% render 'meta-tags' %}
+
+    <script src="{{ 'constants.js' | asset_url }}" defer="defer"></script>
+    <script src="{{ 'pubsub.js' | asset_url }}" defer="defer"></script>
+    <script src="{{ 'global.js' | asset_url }}" defer="defer"></script>
+    <script src="{{ 'details-disclosure.js' | asset_url }}" defer="defer"></script>
+    <script src="{{ 'details-modal.js' | asset_url }}" defer="defer"></script>
+    <script src="{{ 'search-form.js' | asset_url }}" defer="defer"></script>
+
+    {%- if settings.animations_reveal_on_scroll -%}
+      <script src="{{ 'animations.js' | asset_url }}" defer="defer"></script>
+    {%- endif -%}
+
+    {{ content_for_header }}
+
+    {%- liquid
+      assign body_font_bold = settings.type_body_font | font_modify: 'weight', 'bold'
+      assign body_font_italic = settings.type_body_font | font_modify: 'style', 'italic'
+      assign body_font_bold_italic = body_font_bold | font_modify: 'style', 'italic'
+    %}
+
+    {% style %}
+            {{ settings.type_body_font | font_face: font_display: 'swap' }}
+            {{ body_font_bold | font_face: font_display: 'swap' }}
+            {{ body_font_italic | font_face: font_display: 'swap' }}
+            {{ body_font_bold_italic | font_face: font_display: 'swap' }}
+            {{ settings.type_header_font | font_face: font_display: 'swap' }}
+
+            {% for scheme in settings.color_schemes -%}
+              {% assign scheme_classes = scheme_classes | append: ', .color-' | append: scheme.id %}
+              {% if forloop.index == 1 -%}
+                :root,
+              {%- endif %}
+              .color-{{ scheme.id }} {
+                --color-background: {{ scheme.settings.background.red }},
+                {{ scheme.settings.background.green }},
+                {{ scheme.settings.background.blue }};
+                {% if scheme.settings.background_gradient != empty %}
+                  --gradient-background: {{ scheme.settings.background_gradient }};
+                {% else %}
+                  --gradient-background: {{ scheme.settings.background }};
+                {% endif %}
+
+                {% liquid
+                assign background_color = scheme.settings.background
+                assign background_color_brightness = background_color | color_brightness
+                if background_color_brightness <= 26
+                  assign background_color_contrast = background_color | color_lighten: 50
+                elsif background_color_brightness <= 65
+                  assign background_color_contrast = background_color | color_lighten: 5
+                else
+                  assign background_color_contrast = background_color | color_darken: 25
+                endif
+      %}
+
+                --color-foreground: {{ scheme.settings.text.red }},
+                {{ scheme.settings.text.green }},
+                {{ scheme.settings.text.blue }};
+                --color-background-contrast: {{ background_color_contrast.red }},
+                {{ background_color_contrast.green }},
+                {{ background_color_contrast.blue }};
+                --color-shadow: {{ scheme.settings.shadow.red }},
+                {{ scheme.settings.shadow.green }},
+                {{ scheme.settings.shadow.blue }};
+                --color-button: {{ scheme.settings.button.red }},
+                {{ scheme.settings.button.green }},
+                {{ scheme.settings.button.blue }};
+                --color-button-text: {{ scheme.settings.button_label.red }},
+                {{ scheme.settings.button_label.green }},
+                {{ scheme.settings.button_label.blue }};
+                --color-secondary-button: {{ scheme.settings.background.red }},
+                {{ scheme.settings.background.green }},
+                {{ scheme.settings.background.blue }};
+                --color-secondary-button-text: {{ scheme.settings.secondary_button_label.red }},
+                {{ scheme.settings.secondary_button_label.green }},
+                {{ scheme.settings.secondary_button_label.blue }};
+                --color-link: {{ scheme.settings.secondary_button_label.red }},
+                {{ scheme.settings.secondary_button_label.green }},
+                {{ scheme.settings.secondary_button_label.blue }};
+                --color-badge-foreground: {{ scheme.settings.text.red }},
+                {{ scheme.settings.text.green }},
+                {{ scheme.settings.text.blue }};
+                --color-badge-background: {{ scheme.settings.background.red }},
+                {{ scheme.settings.background.green }},
+                {{ scheme.settings.background.blue }};
+                --color-badge-border: {{ scheme.settings.text.red }},
+                {{ scheme.settings.text.green }},
+                {{ scheme.settings.text.blue }};
+                --payment-terms-background-color: rgb({{ scheme.settings.background.rgb }});
+              }
+            {% endfor %}
+
+            {{ scheme_classes | prepend: 'body' }} {
+              color: rgba(var(--color-foreground), 0.75);
+              background-color: rgb(var(--color-background));
+            }
+
+            :root {
+              --font-body-family: {{ settings.type_body_font.family }},
+              {{ settings.type_body_font.fallback_families }};
+              --font-body-style: {{ settings.type_body_font.style }};
+              --font-body-weight: {{ settings.type_body_font.weight }};
+              --font-body-weight-bold: {{ settings.type_body_font.weight | plus: 300 | at_most: 1000 }};
+
+              --font-heading-family: {{ settings.type_header_font.family }},
+              {{ settings.type_header_font.fallback_families }};
+              --font-heading-style: {{ settings.type_header_font.style }};
+              --font-heading-weight: {{ settings.type_header_font.weight }};
+
+              --font-body-scale: {{ settings.body_scale | divided_by: 100.0 }};
+              --font-heading-scale: {{ settings.heading_scale | times: 1.0 | divided_by: settings.body_scale }};
+
+              --media-padding: {{ settings.media_padding }}px;
+              --media-border-opacity: {{ settings.media_border_opacity | divided_by: 100.0 }};
+              --media-border-width: {{ settings.media_border_thickness }}px;
+              --media-radius: {{ settings.media_radius }}px;
+              --media-shadow-opacity: {{ settings.media_shadow_opacity | divided_by: 100.0 }};
+              --media-shadow-horizontal-offset: {{ settings.media_shadow_horizontal_offset }}px;
+              --media-shadow-vertical-offset: {{ settings.media_shadow_vertical_offset }}px;
+              --media-shadow-blur-radius: {{ settings.media_shadow_blur }}px;
+              --media-shadow-visible: {% if settings.media_shadow_opacity > 0 %}1{% else %}0{% endif %};
+
+            --page-width: {{ settings.page_width | divided_by: 10 }}rem;
+            --page-width-margin: {% if settings.page_width == '1600' %}2{% else %}0{% endif %}rem;
+
+          --product-card-image-padding: {{ settings.card_image_padding | divided_by: 10.0 }}rem;
+          --product-card-corner-radius: {{ settings.card_corner_radius | divided_by: 10.0 }}rem;
+          --product-card-text-alignment: {{ settings.card_text_alignment }};
+          --product-card-border-width: {{ settings.card_border_thickness | divided_by: 10.0 }}rem;
+          --product-card-border-opacity: {{ settings.card_border_opacity | divided_by: 100.0 }};
+          --product-card-shadow-opacity: {{ settings.card_shadow_opacity | divided_by: 100.0 }};
+          --product-card-shadow-visible: {% if settings.card_shadow_opacity > 0 %}1{% else %}0{% endif %};
+        --product-card-shadow-horizontal-offset: {{ settings.card_shadow_horizontal_offset | divided_by: 10.0 }}rem;
+        --product-card-shadow-vertical-offset: {{ settings.card_shadow_vertical_offset | divided_by: 10.0 }}rem;
+        --product-card-shadow-blur-radius: {{ settings.card_shadow_blur | divided_by: 10.0 }}rem;
+
+        --collection-card-image-padding: {{ settings.collection_card_image_padding | divided_by: 10.0 }}rem;
+        --collection-card-corner-radius: {{ settings.collection_card_corner_radius | divided_by: 10.0 }}rem;
+        --collection-card-text-alignment: {{ settings.collection_card_text_alignment }};
+        --collection-card-border-width: {{ settings.collection_card_border_thickness | divided_by: 10.0 }}rem;
+        --collection-card-border-opacity: {{ settings.collection_card_border_opacity | divided_by: 100.0 }};
+        --collection-card-shadow-opacity: {{ settings.collection_card_shadow_opacity | divided_by: 100.0 }};
+        --collection-card-shadow-visible: {% if settings.collection_card_shadow_opacity > 0 %}1{% else %}0{% endif %};
+        --collection-card-shadow-horizontal-offset: {{ settings.collection_card_shadow_horizontal_offset | divided_by: 10.0 }}rem;
+        --collection-card-shadow-vertical-offset: {{ settings.collection_card_shadow_vertical_offset | divided_by: 10.0 }}rem;
+        --collection-card-shadow-blur-radius: {{ settings.collection_card_shadow_blur | divided_by: 10.0 }}rem;
+
+        --blog-card-image-padding: {{ settings.blog_card_image_padding | divided_by: 10.0 }}rem;
+        --blog-card-corner-radius: {{ settings.blog_card_corner_radius | divided_by: 10.0 }}rem;
+        --blog-card-text-alignment: {{ settings.blog_card_text_alignment }};
+        --blog-card-border-width: {{ settings.blog_card_border_thickness | divided_by: 10.0 }}rem;
+        --blog-card-border-opacity: {{ settings.blog_card_border_opacity | divided_by: 100.0 }};
+        --blog-card-shadow-opacity: {{ settings.blog_card_shadow_opacity | divided_by: 100.0 }};
+        --blog-card-shadow-visible: {% if settings.blog_card_shadow_opacity > 0 %}1{% else %}0{% endif %};
+        --blog-card-shadow-horizontal-offset: {{ settings.blog_card_shadow_horizontal_offset | divided_by: 10.0 }}rem;
+        --blog-card-shadow-vertical-offset: {{ settings.blog_card_shadow_vertical_offset | divided_by: 10.0 }}rem;
+        --blog-card-shadow-blur-radius: {{ settings.blog_card_shadow_blur | divided_by: 10.0 }}rem;
+
+        --badge-corner-radius: {{ settings.badge_corner_radius | divided_by: 10.0 }}rem;
+
+        --popup-border-width: {{ settings.popup_border_thickness }}px;
+        --popup-border-opacity: {{ settings.popup_border_opacity | divided_by: 100.0 }};
+        --popup-corner-radius: {{ settings.popup_corner_radius }}px;
+        --popup-shadow-opacity: {{ settings.popup_shadow_opacity | divided_by: 100.0 }};
+        --popup-shadow-horizontal-offset: {{ settings.popup_shadow_horizontal_offset }}px;
+        --popup-shadow-vertical-offset: {{ settings.popup_shadow_vertical_offset }}px;
+        --popup-shadow-blur-radius: {{ settings.popup_shadow_blur }}px;
+
+        --drawer-border-width: {{ settings.drawer_border_thickness }}px;
+        --drawer-border-opacity: {{ settings.drawer_border_opacity | divided_by: 100.0 }};
+        --drawer-shadow-opacity: {{ settings.drawer_shadow_opacity | divided_by: 100.0 }};
+        --drawer-shadow-horizontal-offset: {{ settings.drawer_shadow_horizontal_offset }}px;
+        --drawer-shadow-vertical-offset: {{ settings.drawer_shadow_vertical_offset }}px;
+        --drawer-shadow-blur-radius: {{ settings.drawer_shadow_blur }}px;
+
+        --spacing-sections-desktop: {{ settings.spacing_sections }}px;
+        --spacing-sections-mobile: {% if settings.spacing_sections < 24 %}{{ settings.spacing_sections }}
+      {% else %}{{ settings.spacing_sections | times: 0.7 | round | at_least: 20 }}
+      {% endif %}px;
+
+        --grid-desktop-vertical-spacing: {{ settings.spacing_grid_vertical }}px;
+        --grid-desktop-horizontal-spacing: {{ settings.spacing_grid_horizontal }}px;
+        --grid-mobile-vertical-spacing: {{ settings.spacing_grid_vertical | divided_by: 2 }}px;
+        --grid-mobile-horizontal-spacing: {{ settings.spacing_grid_horizontal | divided_by: 2 }}px;
+
+        --text-boxes-border-opacity: {{ settings.text_boxes_border_opacity | divided_by: 100.0 }};
+        --text-boxes-border-width: {{ settings.text_boxes_border_thickness }}px;
+        --text-boxes-radius: {{ settings.text_boxes_radius }}px;
+        --text-boxes-shadow-opacity: {{ settings.text_boxes_shadow_opacity | divided_by: 100.0 }};
+        --text-boxes-shadow-visible: {% if settings.text_boxes_shadow_opacity > 0 %}1{% else %}0{% endif %};
+        --text-boxes-shadow-horizontal-offset: {{ settings.text_boxes_shadow_horizontal_offset }}px;
+        --text-boxes-shadow-vertical-offset: {{ settings.text_boxes_shadow_vertical_offset }}px;
+        --text-boxes-shadow-blur-radius: {{ settings.text_boxes_shadow_blur }}px;
+
+        --buttons-radius: {{ settings.buttons_radius }}px;
+        --buttons-radius-outset: {% if settings.buttons_radius > 0 %}{{ settings.buttons_radius | plus: settings.buttons_border_thickness }}
+      {% else %}0{% endif %}px;
+        --buttons-border-width: {% if settings.buttons_border_opacity > 0 %}{{ settings.buttons_border_thickness }}
+      {% else %}0{% endif %}px;
+        --buttons-border-opacity: {{ settings.buttons_border_opacity | divided_by: 100.0 }};
+        --buttons-shadow-opacity: {{ settings.buttons_shadow_opacity | divided_by: 100.0 }};
+        --buttons-shadow-visible: {% if settings.buttons_shadow_opacity > 0 %}1{% else %}0{% endif %};
+        --buttons-shadow-horizontal-offset: {{ settings.buttons_shadow_horizontal_offset }}px;
+        --buttons-shadow-vertical-offset: {{ settings.buttons_shadow_vertical_offset }}px;
+        --buttons-shadow-blur-radius: {{ settings.buttons_shadow_blur }}px;
+        --buttons-border-offset: {% if settings.buttons_radius > 0 or settings.buttons_shadow_opacity > 0 %}0.3{% else %}0{% endif %}px;
+
+        --inputs-radius: {{ settings.inputs_radius }}px;
+        --inputs-border-width: {{ settings.inputs_border_thickness }}px;
+        --inputs-border-opacity: {{ settings.inputs_border_opacity | divided_by: 100.0 }};
+        --inputs-shadow-opacity: {{ settings.inputs_shadow_opacity | divided_by: 100.0 }};
+        --inputs-shadow-horizontal-offset: {{ settings.inputs_shadow_horizontal_offset }}px;
+        --inputs-margin-offset: {% if settings.inputs_shadow_vertical_offset != 0 and settings.inputs_shadow_opacity > 0 %}{{ settings.inputs_shadow_vertical_offset | abs }}
+      {% else %}0{% endif %}px;
+        --inputs-shadow-vertical-offset: {{ settings.inputs_shadow_vertical_offset }}px;
+        --inputs-shadow-blur-radius: {{ settings.inputs_shadow_blur }}px;
+        --inputs-radius-outset: {% if settings.inputs_radius > 0 %}{{ settings.inputs_radius | plus: settings.inputs_border_thickness }}
+      {% else %}0{% endif %}px;
+
+        --variant-pills-radius: {{ settings.variant_pills_radius }}px;
+        --variant-pills-border-width: {{ settings.variant_pills_border_thickness }}px;
+        --variant-pills-border-opacity: {{ settings.variant_pills_border_opacity | divided_by: 100.0 }};
+        --variant-pills-shadow-opacity: {{ settings.variant_pills_shadow_opacity | divided_by: 100.0 }};
+        --variant-pills-shadow-horizontal-offset: {{ settings.variant_pills_shadow_horizontal_offset }}px;
+        --variant-pills-shadow-vertical-offset: {{ settings.variant_pills_shadow_vertical_offset }}px;
+        --variant-pills-shadow-blur-radius: {{ settings.variant_pills_shadow_blur }}px;
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: inherit;
+      }
+
+      html {
+        box-sizing: border-box;
+        font-size: calc(var(--font-body-scale) * 62.5%);
+        height: 100%;
+      }
+
+      body {
+        display: grid;
+        grid-template-rows: auto auto 1fr auto;
+        grid-template-columns: 100%;
+        min-height: 100%;
+        margin: 0;
+        font-size: 1.5rem;
+        letter-spacing: 0.06rem;
+        line-height: calc(1 + 0.8 / var(--font-body-scale));
+        font-family: var(--font-body-family);
+        font-style: var(--font-body-style);
+        font-weight: var(--font-body-weight);
+      }
+
+      @media screen and (min-width: 750px) {
+        body {
+          font-size: 1.6rem;
+        }
+      }
+    {% endstyle %}
+
+    {{ 'base.css' | asset_url | stylesheet_tag }}
+    {{ 'custom.css' | asset_url | stylesheet_tag }}
+
+    <link
+      rel="stylesheet"
+      href="{{ 'component-cart-items.css' | asset_url }}"
+      media="print"
+      onload="this.media='all'"
+    >
+
+    {%- if settings.cart_type == 'drawer' -%}
+      {{ 'component-cart-drawer.css' | asset_url | stylesheet_tag }}
+      {{ 'component-cart.css' | asset_url | stylesheet_tag }}
+      {{ 'component-totals.css' | asset_url | stylesheet_tag }}
+      {{ 'component-price.css' | asset_url | stylesheet_tag }}
+      {{ 'component-discounts.css' | asset_url | stylesheet_tag }}
+    {%- endif -%}
+
+    {%- unless settings.type_body_font.system? -%}
+      {% comment %}theme-check-disable AssetPreload{% endcomment %}
+      <link
+        rel="preload"
+        as="font"
+        href="{{ settings.type_body_font | font_url }}"
+        type="font/woff2"
+        crossorigin
+      >
+      {% comment %}theme-check-enable AssetPreload{% endcomment %}
+    {%- endunless -%}
+    {%- unless settings.type_header_font.system? -%}
+      {% comment %}theme-check-disable AssetPreload{% endcomment %}
+      <link
+        rel="preload"
+        as="font"
+        href="{{ settings.type_header_font | font_url }}"
+        type="font/woff2"
+        crossorigin
+      >
+      {% comment %}theme-check-enable AssetPreload{% endcomment %}
+    {%- endunless -%}
+
+    {%- if localization.available_countries.size > 1 or localization.available_languages.size > 1 -%}
+      {{ 'component-localization-form.css' | asset_url | stylesheet_tag: preload: true }}
+      <script src="{{ 'localization-form.js' | asset_url }}" defer="defer"></script>
+    {%- endif -%}
+
+    {%- if settings.predictive_search_enabled -%}
+      <link
+        rel="stylesheet"
+        href="{{ 'component-predictive-search.css' | asset_url }}"
+        media="print"
+        onload="this.media='all'"
+      >
+    {%- endif -%}
+
+    <script>
+      if (Shopify.designMode) {
+        document.documentElement.classList.add('shopify-design-mode');
+      }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    >
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    {% comment %} Google Anaylytics {% endcomment %}
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-9HTXCELBNX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag('js', new Date());
+      gtag('config', 'G-9HTXCELBNX');
+    </script>
+    <!-- Meta Pixel Code -->
+    <script>
+      !(function (f, b, e, v, n, t, s) {
+        if (f.fbq) return;
+        n = f.fbq = function () {
+          n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments);
+        };
+        if (!f._fbq) f._fbq = n;
+        n.push = n;
+        n.loaded = !0;
+        n.version = '2.0';
+        n.queue = [];
+        t = b.createElement(e);
+        t.async = !0;
+        t.src = v;
+        s = b.getElementsByTagName(e)[0];
+        s.parentNode.insertBefore(t, s);
+      })(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
+      fbq('init', '1058880252490692');
+      fbq('track', 'PageView');
+    </script>
+    <noscript
+      ><img
+        height="1"
+        width="1"
+        style="display:none"
+        src="https://www.facebook.com/tr?id=1058880252490692&ev=PageView&noscript=1"
+    ></noscript>
+    <!-- End Meta Pixel Code -->
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const selectors = ['.main-product_text-style_caption', '.product-card-specs'];
+        const selectorString = selectors.join(', ');
+
+        const forEachNode = (list, fn) => Array.prototype.forEach.call(list, fn);
+
+        const normalizeText = (el) => {
+          if (!el || el.nodeType !== 1) return; // only element nodes
+
+          const cleaned = (el.textContent || '')
+            .trim()
+            .replace(/^\[/, '') // remove leading [
+            .replace(/\]$/, '') // remove trailing ]
+            .replace(/\\\//g, '/') // convert \/ → /
+            .replace(/\\+/g, '') // remove \\
+            .replace(/"/g, '') // remove quotes
+            .trim();
+
+          if (el.textContent !== cleaned) {
+            el.textContent = cleaned;
+          }
+        };
+
+        const applyToAll = () => {
+          const els = document.querySelectorAll(selectorString);
+          forEachNode(els, normalizeText);
+        };
+
+        applyToAll(); // handle elements present at DOM ready
+
+        // Handle late-loaded elements (in viewport or injected after load)
+        const observer = new MutationObserver((mutations) => {
+          forEachNode(mutations, (mutation) => {
+            forEachNode(mutation.addedNodes || [], (node) => {
+              if (!(node instanceof HTMLElement)) return;
+
+              if (node.matches(selectorString)) normalizeText(node);
+              if (node.querySelectorAll) {
+                forEachNode(node.querySelectorAll(selectorString), normalizeText);
+              }
+            });
+
+            if (mutation.type === 'characterData' && mutation.target && mutation.target.parentElement) {
+              const parent = mutation.target.parentElement;
+              if (parent.matches(selectorString)) normalizeText(parent);
+            }
+          });
+        });
+
+        observer.observe(document.body, {
+          childList: true,
+          subtree: true,
+          characterData: true,
+        });
+      });
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+    <style>
+      #sy-whatshelp {
+          right: 25px;
+          bottom: 90px;
+          position: fixed;
+          z-index: 9999;
+      }
+
+      #sy-whatshelp a.sywh-open-services {
+          background-color: #25d366;
+          color: #fff;
+          margin-top: 10px;
+          border: none;
+          cursor: pointer;
+          width: 50px;
+          height: 50px;
+          box-shadow: 2px 2px 8px -3px #000;
+          border-radius: 100%;
+          -webkit-border-radius: 100%;
+          -moz-border-radius: 100%;
+          -ms-border-radius: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          text-decoration: none;
+      }
+      #sy-whatshelp a.sywh-open-services:hover,
+      #sy-whatshelp a.sywh-open-services:focus,
+      #sy-whatshelp a.sywh-open-services:active {
+          text-decoration: none;
+      }
+
+      #sy-whatshelp a.sywh-open-services .fa-whatsapp {
+          font-size: 33px;
+          line-height: 1;
+          width: auto;
+          min-width: 0;
+          max-width: none;
+      }
+      #sy-whatshelp a.sywh-open-services .fa-whatsapp:before {
+          width: auto;
+          min-width: 0;
+          max-width: none;
+      }
+    </style>
+  </head>
+  <body class="gradient{% if settings.animations_hover_elements != 'none' %} animate--hover-{{ settings.animations_hover_elements }}{% endif %}">
+    <!-- Google Tag Manager (noscript) -->
+    <noscript
+      ><iframe
+        src="https://www.googletagmanager.com/ns.html?id=GTM-PBW8CRH3"
+        height="0"
+        width="0"
+        style="display:none;visibility:hidden"
+      ></iframe
+    ></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    <a class="skip-to-content-link button visually-hidden" href="#MainContent">
+      {{ 'accessibility.skip_to_text' | t }}
+    </a>
+
+    {%- if settings.cart_type == 'drawer' -%}
+      {%- render 'cart-drawer' -%}
+    {%- endif -%}
+    {% if template == 'index' %}
+      <script>
+        document.addEventListener('DOMContentLoaded', function () {
+          const storedReturnUrl = localStorage.getItem('return_url');
+
+          // Clear cached return_url if logged out
+          if (
+            storedReturnUrl &&
+            !window.location.href.includes('/account') &&
+            !document.body.classList.contains('logged-out')
+          ) {
+            localStorage.removeItem('return_url'); // Clean up after use
+            window.location.href = storedReturnUrl;
+          } else {
+            // Ensure no unwanted redirects happen if logged out
+            localStorage.removeItem('return_url'); // Just a precaution
+          }
+
+          console.log('Stored return_url:', storedReturnUrl); // For debugging
+        });
+      </script>
+    {% endif %}
+    {% sections 'header-group' %}
+    {% render 'breadcrumbs' %}
+    <main
+      id="MainContent"
+      class="content-for-layout focus-none"
+      role="main"
+      tabindex="-1"
+    >
+      {{ content_for_layout }}
+      <div id="tryAtHomeOverlay_2" class="try-at-home-overlay" style="display: none;">
+        <div id="tryAtHomePincodePopup_2" class="try-at-home-pincode-popup">
+          <button id="tryAtHomeClose_2" class="try-at-home-close-btn">&times;</button>
+          <h3 class="try-at-home-title">Enter pincode to check availability</h3>
+          <p class="pincode_check_popup_content">{{ settings.try_at_home_text }}</p>
+          <input
+            id="tryAtHomeZipcode_2"
+            type="text"
+            class="try-at-home-pincode-input"
+            placeholder="Pincode"
+            maxlength="6"
+          >
+          <button
+            id="tryAtHomeSubmitBtn_2"
+            type="submit"
+            class="try-at-home-pincode-button"
+          >
+            Check Availability
+          </button>
+          <div id="tryAtHomeRes_2" class="try-at-home-pincode-result"></div>
+          <div id="tryAtHomeButtons_2" class="try-at-home-buttons" style="display: none;">
+            <button
+              id="homeTrialBtn_2"
+              type="button"
+              class="try-at-home-trial-button home-trial-button"
+            >
+              Home Trial
+            </button>
+            <button
+              id="videoTrialBtn_2"
+              type="button"
+              class="try-at-home-trial-button video-trial-button"
+            >
+              Book a Video Trial
+            </button>
+          </div>
+        </div>
+      </div>
+      <style>
+        /* Overlay and background blur */
+        .try-at-home-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+          background: rgba(0, 0, 0, 0.4);
+          backdrop-filter: blur(8px);
+          display: none;
+          justify-content: center;
+          align-items: center;
+          z-index: 1000;
+        }
+
+        /* Popup container */
+        .try-at-home-pincode-popup {
+          position: relative;
+          background: #f4eeeb;
+          padding: 30px 15px;
+          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+          text-align: center;
+          max-width: 415px;
+          width: 90%;
+        }
+
+        /* Close button */
+        .try-at-home-close-btn {
+          position: absolute;
+          top: 37px;
+          right: 10px;
+          background: none;
+          border: none;
+          font-size: 4rem;
+          cursor: pointer;
+          font-weight: 500;
+          font-family: 'Montserrat', sans-serif;
+          line-height: 0;
+          color: #712242;
+        }
+
+        /* Title */
+        .try-at-home-title {
+          font-size: 2rem;
+          margin: 0;
+          font-weight: 500;
+          font-family: var(--font-heading-family);
+          text-align: left;
+        }
+
+        /* Input field */
+        .try-at-home-pincode-input {
+          border: none;
+          color: #712242;
+          font-size: 1.6rem;
+          letter-spacing: 0;
+          font-family: 'Montserrat', sans-serif;
+          font-weight: 600;
+          width: 100%;
+          margin: 19px 0;
+          padding: 9px;
+          background: transparent;
+          border-bottom: solid 1px #71224230;
+        }
+
+        /* Remove up and down arrows from number inputs */
+        .try-at-home-pincode-input[type='text']::-webkit-inner-spin-button,
+        .try-at-home-pincode-input[type='text']::-webkit-outer-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
+        }
+        .try-at-home-pincode-input[type='text'] {
+          -moz-appearance: textfield; /* For Firefox */
+        }
+
+        .try-at-home-pincode-input::placeholder {
+          color: #71224280;
+          font-size: 1.6rem;
+        }
+
+        /* Submit button */
+        .try-at-home-pincode-button {
+          background: #712242;
+          color: #fff;
+          padding: 10px 20px;
+          border: none;
+          border-radius: 4px;
+          font-size: 1.6rem;
+          cursor: pointer;
+          width: 100%;
+          font-family: 'Montserrat', sans-serif;
+          font-weight: 600;
+        }
+
+        .try-at-home-pincode-button:hover {
+          background: #71224260;
+        }
+
+        /* Result messages */
+        .try-at-home-pincode-result {
+          margin-top: 10px;
+          font-size: 14px;
+        }
+
+        .try-at-home-pincode-result.invalid {
+          color: red;
+        }
+
+        .try-at-home-pincode-result.available {
+          color: green;
+        }
+
+        .try-at-home-pincode-result.unavailable {
+          color: orange;
+        }
+
+        /* Trial buttons container */
+        .try-at-home-buttons {
+          margin-top: 20px;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+        }
+
+        /* Trial buttons */
+        .try-at-home-trial-button {
+          background: transparent;
+          color: #712242;
+          padding: 12px 20px;
+          border: solid 1px #712242;
+          border-radius: 4px;
+          font-size: 1.4rem;
+          cursor: pointer;
+          width: 100%;
+          font-family: 'Montserrat', sans-serif;
+          font-weight: 600;
+          transition: all 0.3s ease;
+        }
+
+        .try-at-home-trial-button:hover {
+          background: #712242;
+          color: #fff;
+        }
+
+        /* Home Trial disabled - show Video Trial only */
+        #homeTrialBtn_2 {
+          display: none !important;
+        }
+      </style>
+      <script>
+        const savedPin = localStorage.getItem('user_tryathomepincode');
+        if (/^[1-9][0-9]{5}$/.test(savedPin)) {
+          window.globalTryAtHomePincode = savedPin;
+        }
+      </script>
+
+      <script>
+        document.addEventListener('DOMContentLoaded', () => {
+          
+          const overlay = document.getElementById('tryAtHomeOverlay_2');
+          const pincodePopup = document.getElementById('tryAtHomePincodePopup_2');
+          const closeButton = document.getElementById('tryAtHomeClose_2');
+          const submitButton = document.getElementById('tryAtHomeSubmitBtn_2');
+          const zipcodeInput = document.getElementById('tryAtHomeZipcode_2');
+          const res = document.getElementById('tryAtHomeRes_2');
+          const inventoryElement = document.querySelector('.product__inventory');
+          const productFormButtons = document.querySelector('.product-form__buttons');
+          
+          // ✅ DATA (loaded from JSON)
+          let allPincodes = new Set();
+          let validPincodesGold = new Set();
+          let validPincodesSilver = new Set();
+          let defaultPincodes = allPincodes;
+          let currentValidPincodes = defaultPincodes;
+          
+          // ✅ Load JSON
+          fetch('{{ "pincodes.json" | asset_url }}')
+            .then(res => res.json())
+            .then(data => {
+              validPincodesGold = new Set(data.gold || []);
+              validPincodesSilver = new Set(data.silver || []);
+          
+              allPincodes = new Set([
+                ...validPincodesGold,
+                ...validPincodesSilver
+              ]);
+          
+              defaultPincodes = allPincodes;
+            })
+            .catch(err => console.error('Pincode JSON load failed:', err));
+          
+          const selectedVariantData =
+            {% if template contains 'product' and product %}
+              {{ product.selected_or_first_available_variant | json }}
+            {% else %}
+              null
+            {% endif %};
+          
+          const isProductTemplate = {% if template contains 'product' %}true{% else %}false{% endif %};
+          
+const option1Value =
+  selectedVariantData && selectedVariantData.option1
+    ? selectedVariantData.option1.toString().toLowerCase()
+              : '';
+          
+function getProductPagePincodes() {
+  if (!isProductTemplate) return defaultPincodes;
+
+  if (option1Value.indexOf('gold') > -1 && option1Value.indexOf('vermeil') === -1) {
+    return validPincodesGold;
+  }
+
+  if (option1Value.indexOf('vermeil') > -1 || option1Value.indexOf('silver') > -1) {
+    return validPincodesSilver;
+  }
+
+  return defaultPincodes;
+}
+          let lastClickedButton = null;
+          
+          function isLoggedIn() {
+            return {{ customer != null | json }};
+          }
+          
+          function togglePopup() {
+            const tryAtHomeLinks = document.querySelectorAll(
+              '.c-menu3 a[href*="try-at-home"], .menu-drawer__navigation .menu-item #HeaderDrawer-try-at-home, #tryAtHomeButton, .assisstance_buttons_image_container_2, .two_blocks_grid-section-left a'
+            );
+          
+            tryAtHomeLinks.forEach((link) => {
+              link.addEventListener('click', (e) => {
+                e.preventDefault();
+          
+                const triggeredFromProductInfo = !!link.closest('product-info');
+          
+                currentValidPincodes = triggeredFromProductInfo
+                  ? getProductPagePincodes()
+                  : defaultPincodes;
+          
+                if (window.globalTryAtHomePincode && /^[1-9][0-9]{5}$/.test(window.globalTryAtHomePincode)) {
+                  zipcodeInput.value = window.globalTryAtHomePincode;
+                  localStorage.setItem('user_tryathomepincode', window.globalTryAtHomePincode);
+          
+                  overlay.style.display = 'flex';
+                  showTrialButtons(window.globalTryAtHomePincode);
+                  handleTrialButtonClicks();
+                } else {
+                  overlay.style.display = 'flex';
+                  lastClickedButton = 'try-at-home';
+                }
+              });
+            });
+          
+            closeButton.addEventListener('click', () => {
+              overlay.style.display = 'none';
+              zipcodeInput.value = '';
+              res.textContent = '';
+              res.className = 'try-at-home-pincode-result';
+              document.getElementById('tryAtHomeButtons_2').style.display = 'none';
+              document.getElementById('homeTrialBtn_2').style.display = 'block';
+            });
+          
+            overlay.addEventListener('click', (e) => {
+              if (!pincodePopup.contains(e.target)) {
+                overlay.style.display = 'none';
+                zipcodeInput.value = '';
+                res.textContent = '';
+                res.className = 'try-at-home-pincode-result';
+                document.getElementById('tryAtHomeButtons_2').style.display = 'none';
+                document.getElementById('homeTrialBtn_2').style.display = 'block';
+              }
+            });
+          }
+          
+          function handleDirectRedirect(zipcode) {
+            const tryAtHomeUrl = `/pages/try-at-home?view=try-at-home&product_handle={{ product.handle }}`;
+            const videoTrialUrl = `/pages/video-trial?view=video-trial&product_handle={{ product.handle }}`;
+          
+            if (!isLoggedIn()) {
+              const targetUrl = currentValidPincodes.has(zipcode) ? tryAtHomeUrl : videoTrialUrl;
+              const loginUrl = `/account/login?return_url=${encodeURIComponent(targetUrl)}&kp_login=true&kp_redirect=${encodeURIComponent(targetUrl)}`;
+              window.location.href = loginUrl;
+              return;
+            }
+          
+            if (currentValidPincodes.has(zipcode)) {
+              res.textContent = 'Available';
+              res.className = 'try-at-home-pincode-result available';
+              window.location.href = tryAtHomeUrl;
+            } else {
+              res.textContent = 'Pincode Not Available';
+              res.className = 'try-at-home-pincode-result unavailable';
+              window.location.href = videoTrialUrl;
+            }
+          }
+          
+          function showTrialButtons(zipcode) {
+            const buttonsContainer = document.getElementById('tryAtHomeButtons_2');
+            const homeTrialBtn = document.getElementById('homeTrialBtn_2');
+          
+            if (currentValidPincodes.has(zipcode)) {
+              res.textContent = 'Available - Choose your trial option';
+              res.className = 'try-at-home-pincode-result available';
+              homeTrialBtn.style.display = 'block';
+              buttonsContainer.style.display = 'flex';
+            } else {
+              res.textContent = 'Pincode Not Available - Video Trial Only';
+              res.className = 'try-at-home-pincode-result unavailable';
+              homeTrialBtn.style.display = 'none';
+              buttonsContainer.style.display = 'flex';
+            }
+          }
+          
+          function handleTrialButtonClicks() {
+            const videoTrialBtn = document.getElementById('videoTrialBtn_2');
+            const homeTrialBtn = document.getElementById('homeTrialBtn_2');
+          
+            const tryAtHomeUrl = `/pages/try-at-home?view=try-at-home&product_handle={{ product.handle }}`;
+            const videoTrialUrl = `/pages/video-trial?view=video-trial&product_handle={{ product.handle }}`;
+          
+            videoTrialBtn.addEventListener('click', () => {
+              showVideoTrialForm();
+            });
+          
+            homeTrialBtn.addEventListener('click', () => {
+              if (!isLoggedIn()) {
+                const loginUrl = `/account/login?return_url=${encodeURIComponent(tryAtHomeUrl)}&kp_login=true&kp_redirect=${encodeURIComponent(tryAtHomeUrl)}`;
+                window.location.href = loginUrl;
+              } else {
+                window.location.href = tryAtHomeUrl;
+              }
+            });
+          }
+          
+          function showVideoTrialForm() {
+            const modal = document.getElementById('videoTrialFormModal');
+            if (modal) modal.style.display = 'flex';
+          }
+          
+          function hideVideoTrialForm() {
+            const modal = document.getElementById('videoTrialFormModal');
+            if (modal) {
+              modal.style.display = 'none';
+              document.getElementById('videoTrialName').value = '';
+              document.getElementById('videoTrialMobile').value = '';
+            }
+          }
+          
+          function submitVideoTrialForm() {
+            const name = document.getElementById('videoTrialName').value.trim();
+            const mobile = document.getElementById('videoTrialMobile').value.trim();
+            const pincode = localStorage.getItem('user_tryathomepincode') || '';
+          
+            if (!name || !mobile) {
+              alert('Please fill in both name and mobile number.');
+              return;
+            }
+          
+            if (mobile.length !== 10 || !/^\d+$/.test(mobile)) {
+              alert('Please enter a valid 10-digit mobile number.');
+              return;
+            }
+          
+            const iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            iframe.name = 'hidden-iframe';
+            document.body.appendChild(iframe);
+          
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = 'https://script.google.com/macros/s/AKfycbwXlP51gPGbGDWFnPGCa82BufYzqE8l-ImOF5sVriuCvYk4msBvksIQhk2cBdCX6HQwHw/exec';
+            form.target = 'hidden-iframe';
+            form.style.display = 'none';
+          
+            const formData = {
+              name,
+              mobile,
+              pincode,
+              pincodeAvailable: currentValidPincodes.has(pincode) ? 'Available' : 'Not Available',
+              timestamp: new Date().toISOString(),
+              productHandle: '{{ product.handle }}'
+            };
+          
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'data';
+            input.value = JSON.stringify(formData);
+            form.appendChild(input);
+          
+            document.body.appendChild(form);
+            form.submit();
+          
+            setTimeout(() => {
+              form.remove();
+              iframe.remove();
+            }, 1000);
+          
+            document.getElementById('videoTrialForm').style.display = 'none';
+            document.getElementById('videoTrialThankYou').style.display = 'block';
+          
+            const closeBtn = document.getElementById('tryAtHomeClose_2');
+            if (closeBtn) closeBtn.click();
+          }
+          
+          window.showVideoTrialForm = showVideoTrialForm;
+          window.hideVideoTrialForm = hideVideoTrialForm;
+          window.submitVideoTrialForm = submitVideoTrialForm;
+          window.handleTrialButtonClicks = handleTrialButtonClicks;
+          
+          function handlePincodeCheck() {
+            submitButton.addEventListener('click', () => {
+              const zipcode = zipcodeInput.value.trim();
+              const regex = /^[1-9][0-9]{5}$/;
+          
+              if (!regex.test(zipcode)) {
+                res.textContent = 'Invalid Pincode';
+                res.className = 'try-at-home-pincode-result invalid';
+                return;
+              }
+          
+              localStorage.setItem('user_tryathomepincode', zipcode);
+          
+              showTrialButtons(zipcode);
+              handleTrialButtonClicks();
+            });
+          }
+          
+          zipcodeInput.addEventListener('input', (e) => {
+            e.target.value = e.target.value.replace(/[^0-9]/g, '');
+          });
+          
+          function initializeButton(buttonId) {
+            togglePopup();
+          }
+          
+          initializeButton('tryAtHomeButton');
+          handlePincodeCheck();
+          handleTrialButtonClicks();
+          
+        });
+      </script>
+      <script>
+        window.customer = {
+          id: {{ customer.id | json }},
+          email: {{ customer.email | json }},
+          first_name: {{ customer.first_name | json }},
+          last_name: {{ customer.last_name | json }},
+          // Account-level phone is often empty for KwikPass phone-OTP logins;
+          // fall back to the default address phone, which KwikPass usually sets.
+          phone: {{ customer.phone | default: customer.default_address.phone | json }},
+          default_address: {
+            address1: {{ customer.default_address.address1 | json }},
+            city: {{ customer.default_address.city | json }},
+            province: {{ customer.default_address.province | json }},
+            zip: {{ customer.default_address.zip | json }},
+            country: {{ customer.default_address.country | json }},
+            phone: {{ customer.default_address.phone | json }}
+          }
+        };
+
+        // TEMP PHONE DEBUG — remove once the source of the number is confirmed.
+        // Reload a page while logged in via KwikPass and read this in the console.
+        console.log('[PHONE DEBUG] logged_in(liquid)=', {% if customer %}true{% else %}false{% endif %},
+          '| customer.phone(liquid)=', {{ customer.phone | json }},
+          '| default_address.phone(liquid)=', {{ customer.default_address.phone | json }},
+          '| resolved window.customer.phone=', window.customer.phone);
+      </script>
+      <script>
+        document.addEventListener('DOMContentLoaded', function () {
+          const link = document.getElementById('HeaderDrawer-try-at-home');
+
+          if (link) {
+            link.addEventListener('click', function () {
+              const linkText = link.innerText.trim().toLowerCase();
+
+              if (linkText.includes('try at home')) {
+                const sourceUrl = window.location.href;
+
+                // Full customer info if available
+                const customer = window.customer || {};
+                const address = customer.default_address || {};
+
+                const customerInfo = {
+                  source: 'Burger Menu',
+                  source_url: sourceUrl,
+                  customer_id: customer.id || null,
+                  customer_email: customer.email || null,
+                  customer_name: `${customer.first_name || ''} ${customer.last_name || ''}`.trim(),
+                  customer_phone: customer.phone || null,
+                  customer_address: `${address.address1 || ''}, ${address.city || ''}, ${address.province || ''}, ${
+                    address.zip || ''
+                  }, ${address.country || ''}`.trim(),
+                };
+
+                // ✅ GA4 event
+                gtag('event', 'try_at_home', customerInfo);
+
+                // ✅ Meta Pixel event
+                if (typeof fbq === 'function') {
+                  fbq('trackCustom', 'try_at_home', customerInfo);
+                }
+
+                console.log('try_at_home sent (Burger Menu):', {
+                  ...customerInfo,
+                });
+              }
+            });
+          }
+        });
+      </script>
+
+      <script>
+        document.addEventListener('DOMContentLoaded', function () {
+          const link = document.getElementById('HeaderDrawer-about-us');
+
+          if (link) {
+            link.addEventListener('click', function () {
+              const linkText = link.innerText.trim().toLowerCase();
+
+              if (linkText.includes('about us')) {
+                const sourceUrl = window.location.href;
+
+                // Full customer info if available
+                const customer = window.customer || {};
+                const address = customer.default_address || {};
+
+                const eventData = {
+                  source: 'Burger Menu',
+                  source_url: sourceUrl,
+                  customer_id: customer.id || null,
+                  customer_email: customer.email || null,
+                  customer_name: `${customer.first_name || ''} ${customer.last_name || ''}`.trim(),
+                  customer_phone: customer.phone || null,
+                  customer_address: `${address.address1 || ''}, ${address.city || ''}, ${address.province || ''}, ${
+                    address.zip || ''
+                  }, ${address.country || ''}`.trim(),
+                };
+
+                gtag('event', 'about_us', eventData);
+
+                // ✅ Meta Pixel: send same custom event
+                if (typeof fbq === 'function') {
+                  fbq('trackCustom', 'about_us', eventData);
+                }
+
+                console.log('about_us sent (Burger Menu):', {
+                  ...eventData,
+                  customer_address: address, // keep full object here for debug if needed
+                });
+              }
+            });
+          }
+        });
+      </script>
+    </main>
+
+    <!-- Size Chart Bottom Sheet -->
+    <div id="sizeChartOverlay" class="size-chart-overlay" style="opacity: 0; pointer-events: none;">.</div>
+    <div id="sizeChartBottomSheet" class="size-chart-bottom-sheet" style="transform: translateX(100%);">
+      <div class="size-chart-header">
+        <h2>Size Guide</h2>
+        <button id="closeSizeChartBtn" class="size-chart-close-btn" aria-label="Close size chart">✕</button>
+      </div>
+      <div class="size-chart-content">
+        {%- assign size_chart_product_type = product.type | downcase | strip -%}
+        {%- if size_chart_product_type == 'gold rings' or size_chart_product_type == 'vermeil rings' -%}
+          {% comment %} Hardcoded ring size chart for Gold Rings / Vermeil Rings {% endcomment %}
+          <div class="size-chart-video-section">
+            <h3>How to measure your ring size</h3>
+            <div class="video-container">
+              <video controls playsinline preload="metadata">
+                <source
+                  src="https://cdn.shopify.com/videos/c/o/v/d0d213af2061422a837e2656892a022b.mp4"
+                  type="video/mp4"
+                >
+                Your browser does not support the video tag.
+              </video>
+            </div>
+          </div>
+
+          <div class="size-chart-table-section">
+            <h3>Size Chart</h3>
+            <table class="size-chart-table">
+              <thead>
+                <tr>
+                  <th>Ring Size</th>
+                  <th>Circumference (mm)</th>
+                  <th>Diameter (mm)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>8</td><td>48.1</td><td>15</td></tr>
+                <tr><td>9</td><td>49.0</td><td>15.4</td></tr>
+                <tr><td>10</td><td>50.0</td><td>15.7</td></tr>
+                <tr><td>11</td><td>50.9</td><td>16</td></tr>
+                <tr><td>12</td><td>51.8</td><td>16.4</td></tr>
+                <tr><td>13</td><td>52.8</td><td>16.7</td></tr>
+                <tr><td>14</td><td>54.0</td><td>17.1</td></tr>
+                <tr><td>15</td><td>55.0</td><td>17.4</td></tr>
+                <tr><td>16</td><td>55.9</td><td>17.8</td></tr>
+                <tr><td>17</td><td>56.9</td><td>18</td></tr>
+                <tr><td>18</td><td>57.8</td><td>18.4</td></tr>
+                <tr><td>19</td><td>59.1</td><td>18.7</td></tr>
+                <tr><td>20</td><td>60.0</td><td>19</td></tr>
+                <tr><td>21</td><td>60.9</td><td>19.3</td></tr>
+                <tr><td>22</td><td>61.9</td><td>19.7</td></tr>
+                <tr><td>23</td><td>62.8</td><td>20</td></tr>
+                <tr><td>24</td><td>63.8</td><td>20.3</td></tr>
+                <tr><td>25</td><td>64.7</td><td>20.6</td></tr>
+                <tr><td>26</td><td>66.0</td><td>20.9</td></tr>
+                <tr><td>27</td><td>66.9</td><td>21.2</td></tr>
+              </tbody>
+            </table>
+          </div>
+        {%- else -%}
+          {% if product.metafields.custom.size_chart_video %}
+            <div class="size-chart-video-section">
+              <h3>How to measure your ring size</h3>
+              <div class="video-container">
+                {% assign video_obj = product.metafields.custom.size_chart_video.value %}
+                {{ video_obj | video_tag: controls: true }}
+              </div>
+            </div>
+          {% endif %}
+
+          {% if product.metafields.custom.size_chart_headings and product.metafields.custom.size_chart %}
+            <div class="size-chart-table-section">
+              <h3>Size Chart</h3>
+              <table class="size-chart-table">
+                <thead>
+                  <tr>
+                    {% for heading in product.metafields.custom.size_chart_headings.value %}
+                      <th>{{ heading }}</th>
+                    {% endfor %}
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for row in product.metafields.custom.size_chart.value %}
+                    <tr>
+                      {% if row.column_1 %}
+                        <td>{{ row.column_1 }}</td>
+                      {% endif %}
+                      {% if row.column_2 %}
+                        <td>{{ row.column_2 }}</td>
+                      {% endif %}
+                      {% if row.column_3 %}
+                        <td>{{ row.column_3 }}</td>
+                      {% endif %}
+                      {% if row.column_4 %}
+                        <td>{{ row.column_4 }}</td>
+                      {% endif %}
+                      {% if row.column_5 %}
+                        <td>{{ row.column_5 }}</td>
+                      {% endif %}
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% endif %}
+        {%- endif -%}
+
+        <!-- Contact CTA -->
+        <div class="contact-cta-section">
+          <a
+            href="https://api.whatsapp.com/send?phone=919217975782&amp;text=Ring Size Guide"
+            class="contact-cta-button whatsapp-cta"
+          >
+            WhatsApp us
+          </a>
+        </div>
+      </div>
+    </div>
+
+    {% sections 'footer-group' %}
+
+    <ul hidden>
+      <li id="a11y-refresh-page-message">{{ 'accessibility.refresh_page' | t }}</li>
+      <li id="a11y-new-window-message">{{ 'accessibility.link_messages.new_window' | t }}</li>
+    </ul>
+
+    <script>
+      window.shopUrl = '{{ request.origin }}';
+      window.routes = {
+        cart_add_url: '{{ routes.cart_add_url }}',
+        cart_change_url: '{{ routes.cart_change_url }}',
+        cart_update_url: '{{ routes.cart_update_url }}',
+        cart_url: '{{ routes.cart_url }}',
+        predictive_search_url: '{{ routes.predictive_search_url }}',
+      };
+
+      window.cartStrings = {
+        error: `{{ 'sections.cart.cart_error' | t }}`,
+        quantityError: `{{ 'sections.cart.cart_quantity_error_html' | t: quantity: '[quantity]' }}`,
+      };
+
+      window.variantStrings = {
+        addToCart: `{{ 'products.product.add_to_cart' | t }}`,
+        soldOut: `{{ 'products.product.sold_out' | t }}`,
+        unavailable: `{{ 'products.product.unavailable' | t }}`,
+        unavailable_with_option: `{{ 'products.product.value_unavailable' | t: option_value: '[value]' }}`,
+      };
+
+      window.quickOrderListStrings = {
+        itemsAdded: `{{ 'sections.quick_order_list.items_added.other' | t: quantity: '[quantity]' }}`,
+        itemAdded: `{{ 'sections.quick_order_list.items_added.one' | t: quantity: '[quantity]' }}`,
+        itemsRemoved: `{{ 'sections.quick_order_list.items_removed.other' | t: quantity: '[quantity]' }}`,
+        itemRemoved: `{{ 'sections.quick_order_list.items_removed.one' | t: quantity: '[quantity]' }}`,
+        viewCart: `{{- 'sections.quick_order_list.view_cart' | t -}}`,
+        each: `{{- 'sections.quick_order_list.each' | t: money: '[money]' }}`,
+        min_error: `{{- 'sections.quick_order_list.min_error' | t: min: '[min]' }}`,
+        max_error: `{{- 'sections.quick_order_list.max_error' | t: max: '[max]' }}`,
+        step_error: `{{- 'sections.quick_order_list.step_error' | t: step: '[step]' }}`,
+      };
+
+      window.accessibilityStrings = {
+        imageAvailable: `{{ 'products.product.media.image_available' | t: index: '[index]' }}`,
+        shareSuccess: `{{ 'general.share.success_message' | t }}`,
+        pauseSlideshow: `{{ 'sections.slideshow.pause_slideshow' | t }}`,
+        playSlideshow: `{{ 'sections.slideshow.play_slideshow' | t }}`,
+        recipientFormExpanded: `{{ 'recipient.form.expanded' | t }}`,
+        recipientFormCollapsed: `{{ 'recipient.form.collapsed' | t }}`,
+        countrySelectorSearchCount: `{{ 'localization.country_results_count' | t: count: '[count]' }}`,
+      };
+    </script>
+
+    {%- if settings.predictive_search_enabled -%}
+      <script src="{{ 'predictive-search.js' | asset_url }}" defer="defer"></script>
+    {%- endif -%}
+
+    {%- if settings.cart_type == 'drawer' -%}
+      <script src="{{ 'cart-drawer.js' | asset_url }}" defer="defer"></script>
+    {%- endif -%}
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const contactLink = document.querySelector('.scrollable_contact_menu_header');
+        const footer = document.querySelector('.footer');
+
+        if (contactLink && footer) {
+          contactLink.addEventListener('click', (event) => {
+            event.preventDefault(); // Prevent any default navigation
+            footer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          });
+        }
+      });
+    </script>
+    {% comment %}
+      {% if template == 'product' %}
+        <script>
+          (function() {
+            let variantIdFromURL;
+
+            function formatMoney(amount) {
+              return new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(amount);
+            }
+
+            const variantMetafields = {
+              {% for variant in product.variants %}
+                {{ variant.id }}:
+                {% if variant.metafields.content.price_breakdown %}
+                  {
+                    {% for item in variant.metafields.content.price_breakdown.value %}
+                      "{{ item.title }}": {
+                        "selling_price": "{{ item.selling_price.value | default: 0 }}",
+                        "compare_at_price": "{{ item.compare_at_price.value | default: 0 }}",
+                        "subtitle_1": "{{ item.subtitle_1 | escape }}",
+                        "subtitle_2": "{{ item.subtitle_2 | escape }}"
+                      }
+                      {% unless forloop.last %},{% endunless %}
+                    {% endfor %}
+                  }
+                {% else %}
+                  null
+                {% endif %}
+                {% unless forloop.last %},{% endunless %}
+              {% endfor %}
+            };
+
+            console.log('Variant Metafields:', variantMetafields);
+
+            function updatePriceBreakdown(variantId) {
+              console.log("Updating price breakdown for variant ID:", variantId);
+
+              const selectedVariantBreakdown = variantMetafields[String(variantId)];
+              console.log("Selected Variant Breakdown:", selectedVariantBreakdown);
+
+              const priceBreakdownList = document.querySelector(".price-breakdown-list");
+              if (!priceBreakdownList) {
+                console.error("Element '.price-breakdown-list' not found.");
+                return;
+              }
+
+              priceBreakdownList.innerHTML = "";
+
+              if (!selectedVariantBreakdown) {
+                console.warn(`No price breakdown available for variant ID: ${variantId}`);
+                priceBreakdownList.innerHTML = '<li>No price breakdown available for this variant.</li>';
+                return;
+              }
+
+              for (const [key, value] of Object.entries(selectedVariantBreakdown)) {
+                if (!value) continue;
+
+                const listItem = document.createElement("li");
+                listItem.innerHTML = `
+                  <div class="price_breakdown-left_container">
+                    <div class="price_breakdown-left_container_top">
+                      <span>${key}</span>
+                      ${
+                        value.compare_at_price > 0 && value.selling_price > 0
+                          ? `<span class="price_discount">${Math.round(
+                              ((value.compare_at_price - value.selling_price) / value.compare_at_price) * 100
+                            )}% off</span>`
+                          : ""
+                      }
+                    </div>
+                    <div class="price_breakdown-left_container_bottom">
+                      <p>${value.subtitle_1 || ""}</p>
+                      <p>${value.subtitle_2 || ""}</p>
+                    </div>
+                  </div>
+                  <div class="price_breakdown-right_container">
+                    ${
+                      value.selling_price > 0
+                        ? `<span>₹${formatMoney(value.selling_price)}</span>`
+                        : ""
+                    }
+                    ${
+                      value.compare_at_price > 0
+                        ? `<span class="price_breakdown_compare_at_price">₹${formatMoney(value.compare_at_price)}</span>`
+                        : ""
+                    }
+                  </div>
+                `;
+                priceBreakdownList.appendChild(listItem);
+              }
+            }
+
+            function checkVariantInURL() {
+              const urlParams = new URLSearchParams(window.location.search);
+              variantIdFromURL = urlParams.get("variant");
+              console.log("Detected variant in URL:", variantIdFromURL);
+
+              if (variantIdFromURL) {
+                updatePriceBreakdown(variantIdFromURL);
+              }
+            }
+
+            function handleSelectChange(e) {
+              const selectedOptionValue = e.target.value;
+              console.log("Selected option value:", selectedOptionValue);
+
+              if (selectedOptionValue) {
+                const newURL = new URL(window.location);
+                newURL.searchParams.set("variant", selectedOptionValue);
+                window.history.pushState({ path: newURL.href }, "", newURL.href);
+
+                checkVariantInURL();
+              }
+            }
+
+            function handleVariantButtonClick(e) {
+              const newVariantId = e.target.getAttribute("data-variant-id");
+              console.log("Variant button clicked. New VariantId:", newVariantId);
+
+              if (newVariantId) {
+                const newURL = new URL(window.location);
+                newURL.searchParams.set("variant", newVariantId);
+                window.history.pushState({ path: newURL.href }, "", newURL.href);
+
+                checkVariantInURL();
+              }
+            }
+
+            function attachEventListeners() {
+              document.querySelectorAll("select").forEach((selectElement) => {
+                selectElement.addEventListener("change", handleSelectChange);
+              });
+
+              document.querySelectorAll("[data-variant-id]").forEach((variantButton) => {
+                variantButton.addEventListener("click", handleVariantButtonClick);
+              });
+
+              window.addEventListener("popstate", () => {
+                console.log("History changed, checking variant in URL...");
+                checkVariantInURL();
+              });
+            }
+
+            document.addEventListener("DOMContentLoaded", () => {
+              console.log("Page loaded, checking variant in URL...");
+              checkVariantInURL();
+              attachEventListeners();
+            });
+          })();
+        </script>
+      {% endif %}
+    {% endcomment %}
+    {% render 'kwikpass' %}
+    {% comment %} Google Analytics homepage_view + Meta Pixel {% endcomment %}
+    <script>
+   document.addEventListener('DOMContentLoaded', function () {
+    const pageTitle = document.title;
+    const pageUrl = window.location.href;
+    const isHomePage = {{ request.page_type == 'index' | json }};
+
+    {% if customer %}
+      const customerData = {
+        id: {{ customer.id | json }},
+        email: {{ customer.email | json }},
+        first_name: {{ customer.first_name | json }},
+        last_name: {{ customer.last_name | json }},
+        phone: {{ customer.phone | default: customer.default_address.phone | json }},
+        address: {
+          address1: {{ customer.default_address.address1 | json }},
+          city: {{ customer.default_address.city | json }},
+          province: {{ customer.default_address.province | json }},
+          zip: {{ customer.default_address.zip | json }},
+          country: {{ customer.default_address.country | json }}
+        }
+      };
+    {% else %}
+      const customerData = {
+        id: null,
+        email: null,
+        first_name: null,
+        last_name: null,
+        phone: null,
+        address: {
+          address1: null,
+          city: null,
+          province: null,
+          zip: null,
+          country: null
+        }
+      };
+    {% endif %}
+
+    gtag('event', isHomePage ? 'homepage_view' : 'page_view_custom', {
+      page_title: pageTitle,
+      page_location: pageUrl,
+      customer_id: customerData.id,
+      customer_email: customerData.email,
+      customer_first_name: customerData.first_name,
+      customer_last_name: customerData.last_name,
+      customer_phone: customerData.phone,
+      customer_address: `${customerData.address.address1 || ''}, ${customerData.address.city || ''}, ${customerData.address.province || ''}, ${customerData.address.zip || ''}, ${customerData.address.country || ''}`.trim()
+    });
+
+    // ✅ Meta Pixel: Send same event to Meta
+    if (typeof fbq === 'function') {
+      fbq('trackCustom', isHomePage ? 'homepage_view' : 'page_view_custom', {
+        page_title: pageTitle,
+        page_location: pageUrl,
+        customer_id: customerData.id,
+        customer_email: customerData.email,
+        customer_first_name: customerData.first_name,
+        customer_last_name: customerData.last_name,
+        customer_phone: customerData.phone,
+        customer_address: `${customerData.address.address1 || ''}, ${customerData.address.city || ''}, ${customerData.address.province || ''}, ${customerData.address.zip || ''}, ${customerData.address.country || ''}`.trim()
+      });
+    }
+
+    console.log('Page view event sent:', {
+      page_title: pageTitle,
+      page_location: pageUrl,
+      customer_id: customerData.id,
+      customer_email: customerData.email,
+      customer_first_name: customerData.first_name,
+      customer_last_name: customerData.last_name,
+      customer_phone: customerData.phone,
+      customer_address: customerData.address
+    });
+   });
+    </script>
+
+    {% comment %} Video Trial Form Modal {% endcomment %}
+    <div id="videoTrialFormModal" class="video-trial-modal" style="display: none;">
+      <div class="try-at-home-pincode-popup">
+        <div class="video-trial-modal-header">
+          <h3 class="try-at-home-title">Book Video Trial</h3>
+          <button class="video-trial-close-btn" onclick="hideVideoTrialForm()">&times;</button>
+        </div>
+        <div class="video-trial-modal-body">
+          <p>Please provide your details to proceed with the video trial booking.</p>
+          <form id="videoTrialForm" onsubmit="event.preventDefault(); submitVideoTrialForm();">
+            <div class="form-group">
+              <label for="videoTrialName">Full Name *</label>
+              <input type="text" id="videoTrialName" required placeholder="Enter your full name">
+            </div>
+            <div class="form-group">
+              <label for="videoTrialMobile">Mobile Number *</label>
+              <input
+                type="tel"
+                id="videoTrialMobile"
+                required
+                placeholder="Enter 10-digit mobile number"
+                maxlength="10"
+              >
+            </div>
+            <div class="form-actions">
+              <button type="button" class="cancel-btn" onclick="hideVideoTrialForm()">Cancel</button>
+              <button type="submit" class="proceed-btn">Proceed with Booking</button>
+            </div>
+          </form>
+          <div
+            id="videoTrialThankYou"
+            style="display:none; text-align:center; padding: 30px 0; font-size: 1.5rem; color: #2e7d32; font-weight: 600;"
+          >
+            <span>Your request has been submitted successfully. We'll contact you shortly.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <style>
+      .video-trial-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+      }
+
+      .video-trial-modal-content {
+        background: white;
+        border-radius: 8px;
+        padding: 0;
+        max-width: 500px;
+        width: 90%;
+        max-height: 80vh;
+        overflow-y: auto;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+      }
+
+      .video-trial-modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #eee;
+      }
+
+      .video-trial-close-btn {
+        border: none;
+        padding: 0;
+        background: none;
+        font-size: 4rem;
+        cursor: pointer;
+        font-weight: 500;
+        font-family: 'Montserrat', sans-serif;
+        line-height: 0;
+        color: #712242;
+      }
+
+      .video-trial-close-btn:hover {
+        color: #333;
+      }
+
+      .video-trial-modal-body p {
+        margin-top: 13px;
+        margin-bottom: 20px;
+        color: #000;
+        font-size: 1.4rem;
+        letter-spacing: 0;
+        text-align: left;
+        line-height: 1.9rem;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: start;
+        letter-spacing: 0;
+      }
+
+      .form-group label {
+        display: block;
+        font-weight: 400;
+        font-family: var(--font-heading-family);
+        color: #000;
+        font-size: 1.6rem;
+        margin: 0;
+      }
+
+      .form-group input {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 1.4rem;
+        box-sizing: border-box;
+      }
+
+      .form-group input:focus {
+        outline: none;
+        border-color: #712242;
+        box-shadow: 0 0 0 2px rgba(0, 124, 186, 0.2);
+      }
+
+      .form-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 30px;
+        flex-direction: column-reverse;
+        width: 100%;
+      }
+
+      .cancel-btn,
+      .proceed-btn {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 4px;
+        font-size: 1.4rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .cancel-btn {
+        background-color: #f8f9fa;
+        color: #666;
+        border: 1px solid #ddd;
+      }
+
+      .cancel-btn:hover {
+        background-color: #e9ecef;
+      }
+
+      .proceed-btn {
+        background-color: #712242;
+        color: white;
+      }
+
+      .proceed-btn:hover {
+        background-color: #712242;
+      }
+
+      @media (max-width: 768px) {
+        .video-trial-modal-content {
+          width: 95%;
+          margin: 20px;
+        }
+
+        .cancel-btn,
+        .proceed-btn {
+          width: 100%;
+        }
+      }
+    </style>
+
+    {% comment %} Whatsapp Floater {% endcomment %}
+    {% comment %} <script
+      type="text/javascript"
+      src="https://d3mkw6s8thqya7.cloudfront.net/integration-plugin.js"
+      id="aisensy-wa-widget"
+      widget-id="aaaer2"
+    ></script>
+    <style>
+      #df-btn-cont .df-btn {
+        bottom: 90px !important;
+        z-index: 2 !important;
+      }
+    </style>
+ {% endcomment %}
+    <!-- Size Chart Bottom Sheet Styles -->
+    <style>
+      .size-chart-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 998;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+      }
+
+      .size-chart-overlay.active {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .size-chart-bottom-sheet {
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: auto;
+        width: min(480px, 92vw);
+        background-color: white;
+        border-radius: 16px 0 0 16px;
+        max-height: 100%;
+        max-height: -webkit-fill-available;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        z-index: 999;
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+        box-shadow: -4px 0 16px rgba(0, 0, 0, 0.15);
+      }
+
+      .size-chart-bottom-sheet.active {
+        transform: translateX(0);
+      }
+
+      .size-chart-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px;
+        border-bottom: 1px solid #eee;
+        position: sticky;
+        top: 0;
+        background-color: white;
+        border-radius: 16px 0 0 0;
+      }
+
+      .size-chart-header h2 {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #333;
+      }
+
+      .size-chart-close-btn {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: #666;
+        padding: 0;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: background-color 0.2s ease;
+      }
+
+      .size-chart-close-btn:hover {
+        background-color: #f5f5f5;
+      }
+
+      .size-chart-content {
+        padding: 20px;
+      }
+
+      .size-chart-video-section,
+      .size-chart-table-section {
+        margin-bottom: 30px;
+        margin-top: 0;
+      }
+
+      .size-chart-video-section {
+        padding: 0;
+      }
+
+      .size-chart-video-section h3,
+      .size-chart-table-section h3 {
+        font-size: 13px;
+        font-weight: 600;
+        margin: 0 0 15px 0;
+        color: #333;
+        font-family: 'Montserrat';
+        letter-spacing: 0;
+      }
+
+      .video-container {
+        position: relative;
+        width: 100%;
+        overflow: hidden;
+        border-radius: 8px;
+        background-color: #000;
+      }
+
+      .video-container video {
+        display: block;
+        width: 100%;
+        height: auto;
+        max-height: 300px;
+        object-fit: contain;
+      }
+
+      .video-container iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border: none;
+        border-radius: 8px;
+      }
+
+      .size-chart-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+      }
+
+      .size-chart-table thead {
+        background-color: #f5f5f5;
+      }
+
+      .size-chart-table th {
+        padding: 12px;
+        text-align: left;
+        font-weight: 600;
+        color: #333;
+        border-bottom: 2px solid #ddd;
+        font-size: 13px;
+      }
+
+      .size-chart-table td {
+        padding: 12px;
+        border-bottom: 1px solid #eee;
+        color: #666;
+        font-size: 13px;
+        text-align: center;
+      }
+
+      .size-chart-table tbody tr:hover {
+        background-color: #fafafa;
+      }
+
+      /* Responsive Design */
+      @media (max-width: 768px) {
+        .size-chart-bottom-sheet {
+          top: auto;
+          right: 0;
+          bottom: 0;
+          left: 0;
+          width: 100%;
+          border-radius: 20px 20px 0 0;
+          max-height: 95svh;
+          transform: translateY(100%);
+          box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .size-chart-bottom-sheet.active {
+          transform: translateY(0);
+        }
+
+        .size-chart-header {
+          border-radius: 20px 20px 0 0;
+        }
+
+        .size-chart-header h2 {
+          font-size: 13px;
+        }
+
+        .size-chart-content {
+          padding: 16px;
+        }
+
+        .size-chart-table th,
+        .size-chart-table td {
+          padding: 10px 8px;
+          font-size: 13px;
+        }
+      }
+
+      /* Size Chart Button Styling */
+      .size-chart-btn {
+        color: #712242;
+        font-size: 13px;
+        text-decoration: underline;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        padding: 0 !important;
+        background: transparent !important;
+        margin-left: 12px;
+        transition: all 0.2s ease;
+        font-family: 'montserrat', sans-serif;
+      }
+
+      @media (max-width: 768px) {
+        .size-chart-btn {
+          padding: 5px 10px;
+          margin-left: 8px;
+        }
+      }
+    </style>
+    <div id="sy-whatshelp">
+        <a href="https://api.whatsapp.com/send?phone=919217975782&text=Hi" target="_blank" class="sywh-open-services " data-html="true" data-placement="left">
+          <i class="fab fa-whatsapp"></i>
+         </a>        
+</div>
+
+  </body>
+</html>

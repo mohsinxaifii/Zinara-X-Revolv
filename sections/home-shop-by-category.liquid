@@ -1,0 +1,312 @@
+<section class="shop-by-category-section">
+  <div class="page-width container">
+    <h2 class="section-heading">{{ section.settings.heading }}</h2>
+    <div class="category-tabs-row">
+      {% for block in section.blocks %}
+        {% if block.type == 'tab' %}
+          <button class="category-tab-button {% if forloop.first %}active{% endif %}" data-tab="{{ block.id }}">
+            {{ block.settings.tab_title }}
+          </button>
+        {% endif %}
+      {% endfor %}
+    </div>
+    <div class="category-tabs-content">
+      {% for block in section.blocks %}
+        {% if block.type == 'tab' %}
+          <div class="category-tab-content {% if forloop.first %}active{% endif %}" id="{{ block.id }}">
+            <div class="category-items-row">
+              {% assign tab_title = block.settings.tab_title | downcase %}
+              {% for item in section.blocks %}
+                {% if item.type == 'category_item' %}
+                  {% assign associated_tab = item.settings.associated_tab | downcase %}
+                  {% if associated_tab == tab_title %}
+                    <div class="category-item">
+                      <a href="{{ collections[item.settings.collection].url }}">
+                        <img src="{{ item.settings.image | image_url }}" alt="{{ item.settings.text }}">
+                        <p>{{ item.settings.text }}</p>
+                      </a>
+                    </div>
+                  {% endif %}
+                {% endif %}
+              {% endfor %}
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const categoryLinks = document.querySelectorAll('.category-item a');
+
+    categoryLinks.forEach((link) => {
+      link.addEventListener('click', function (e) {
+        const categoryName = link.querySelector('p')?.innerText || 'Unknown';
+        const categoryUrl = link.href || 'Unknown';
+        const currentUrl = window.location.href;
+
+        // Prevent immediate navigation
+        e.preventDefault();
+
+        // Customer data
+        const customer = window.customer || {};
+        const address = customer.default_address || {};
+
+        const customerInfo = {
+          customer_id: customer.id || null,
+          customer_email: customer.email || null,
+          customer_name: `${customer.first_name || ''} ${customer.last_name || ''}`.trim(),
+          customer_phone: customer.phone || null,
+          customer_address: `${address.address1 || ''}, ${address.city || ''}, ${address.province || ''}, ${
+            address.zip || ''
+          }, ${address.country || ''}`.trim(),
+        };
+
+        // ✅ Send event to GA4
+        gtag('event', 'category_click', {
+          category_name: categoryName,
+          category_url: categoryUrl,
+          page_title: document.title,
+          page_location: currentUrl,
+          ...customerInfo,
+        });
+
+        // ✅ Send event to Meta Pixel
+        if (typeof fbq === 'function') {
+          fbq('trackCustom', 'category_click', {
+            category_name: categoryName,
+            category_url: categoryUrl,
+            page_title: document.title,
+            page_location: currentUrl,
+            ...customerInfo,
+          });
+        }
+
+        console.log('category_click sent:', {
+          category_name: categoryName,
+          category_url: categoryUrl,
+          ...customerInfo,
+        });
+
+        // Redirect after slight delay
+        setTimeout(() => {
+          window.location.href = categoryUrl;
+        }, 300);
+      });
+    });
+  });
+</script>
+
+<style>
+  .shop-by-category-section {
+    background-color: #f4eeeb;
+    padding-top: 40px;
+    padding-bottom: 40px;
+    margin-top: 40px;
+  }
+  .shop-by-category-section .section-heading {
+    margin-top: 0 !important;
+  }
+  .category-tabs-row {
+    display: flex;
+    padding: 0 25px;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    border-bottom: solid 1px #00000020;
+    overflow: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .category-tab-button {
+    background-color: transparent;
+    font-size: 2rem;
+    font-weight: 400;
+    padding: 10px 15px;
+    cursor: pointer;
+    border: none;
+    font-family: var(--font-body-family);
+    color: #000;
+    transition: background-color 0.3s;
+  }
+
+  .category-tab-button.active {
+    border-bottom: solid 1px #610c27;
+    font-weight: 700;
+    color: #610c27;
+  }
+  .category-item {
+    min-width: 24%;
+    width: 24%;
+    height: fit-content;
+  }
+  .category-item img {
+    width: 100%;
+    height: auto;
+  }
+  .category-tab-content {
+    display: none;
+  }
+
+  .category-tab-content.active {
+    display: block;
+  }
+
+  .category-carousel {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+  }
+
+  .carousel-item {
+    flex: 0 0 auto;
+    width: 200px;
+    text-align: center;
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 8px;
+    transition: box-shadow 0.3s;
+  }
+
+  .carousel-item:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  .carousel-item img {
+    width: 100%;
+    height: auto;
+    margin-bottom: 10px;
+  }
+
+  .category-carousel::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  .category-carousel::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 3px;
+  }
+
+  .category-carousel::-webkit-scrollbar-thumb:hover {
+    background: #999;
+  }
+  .category-items-row {
+    display: flex;
+    overflow: auto;
+    align-items: start;
+    justify-content: start;
+    gap: 10px;
+    margin-top: 20px;
+  }
+  .category-item a {
+    text-decoration: none;
+  }
+  .category-items-row p {
+    text-align: center;
+    color: #000;
+    margin: 0;
+    font-weight: 500;
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const tabButtons = document.querySelectorAll('.category-tab-button');
+    const tabContents = document.querySelectorAll('.category-tab-content');
+
+    tabButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        tabButtons.forEach((btn) => btn.classList.remove('active'));
+        tabContents.forEach((tab) => tab.classList.remove('active'));
+
+        button.classList.add('active');
+        document.getElementById(button.dataset.tab).classList.add('active');
+      });
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Shop by Category",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Section Heading",
+      "default": "Shop by Category"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "tab",
+      "name": "Category Tab",
+      "settings": [
+        {
+          "type": "text",
+          "id": "tab_title",
+          "label": "Tab Title",
+          "default": "Rings"
+        }
+      ]
+    },
+    {
+      "type": "category_item",
+      "name": "Category Item",
+      "settings": [
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Select Collection"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "Category Name"
+        },
+        {
+          "type": "select",
+          "id": "associated_tab",
+          "label": "Associated Tab",
+          "options": [
+            {
+              "value": "Rings",
+              "label": "Rings"
+            },
+            {
+              "value": "earrings",
+              "label": "Earrings"
+            },
+            {
+              "value": "pendants",
+              "label": "Pendants"
+            },
+            {
+              "value": "bracelets",
+              "label": "Bracelets"
+            },
+            {
+              "value": "necklaces",
+              "label": "Necklaces"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Shop by Category",
+      "category": "Custom"
+    }
+  ]
+}
+{% endschema %}

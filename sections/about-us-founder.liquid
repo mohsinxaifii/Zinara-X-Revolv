@@ -1,0 +1,79 @@
+<section class="management-message py-5">
+  <div class="container-xl pt-md-4 position-relative custom-width">
+    <div class="row">
+      <div class="col-lg-11 col-xl-10 mx-auto text-center">
+        <div class="section-heading">
+          <h6 style="font-family: 'Canela', serif;" class="all_heading  mb-4">Meet Our Founder</h6>
+        </div>
+        <div class="message-container bg-white shadow-sm">
+          <div class="row">
+            <div class="col-lg-11 mx-auto">
+              <figure class="management-photo mb-3">
+                <img
+                  class="rounded-circle img-fluid d-block mx-auto"
+                  src="https://cdn.shopify.com/s/files/1/0597/5080/9671/files/kartik-giri.jpg?v=1740123001"
+                  alt=""
+                >
+              </figure>
+
+              <div style="font-family: 'Lato', sans-serif;" class="fs15 lh160">
+                {{ section.settings.founder_richtext }}
+              </div>
+              <div style="font-family: 'Canela', serif;" class="mb-0 light-text fs15">Warm Regards,</div>
+              <h5 style="font-family: 'Canela', serif;" class="mb-0 fs18 fw500">Kartik Giri</h5>
+              <p style="font-family: 'Lato', sans-serif;" class="fs13 text-brand">
+                Founder – Giri Zever Mahal Private Limited
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<style>
+  .management-message {
+    position: relative;
+    background: #cb8161;
+  }
+  .management-message:before {
+    content: '';
+    background-color: #fdfbf5;
+    display: block;
+    height: 340px;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    border-radius: 0 0 80px 80px;
+  }
+  .management-photo img {
+    border: 8px solid #fdfbf5;
+  }
+  .management-photo {
+    margin: 0 auto;
+    max-width: 250px;
+    margin-top: -135px;
+  }
+  .message-container {
+    padding: 40px 10px;
+    margin-top: 110px;
+  }
+</style>
+{% schema %}
+{
+  "name": "About Us Founder",
+  "settings": [
+    {
+      "type": "richtext",
+      "id": "founder_richtext",
+      "label": "Founder Content"
+    }
+  ],
+  "presets": [
+    {
+      "name": "About Us Founder"
+    }
+  ]
+}
+{% endschema %}

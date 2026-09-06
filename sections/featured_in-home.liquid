@@ -1,0 +1,91 @@
+<link rel="stylesheet" href="{{ 'featured_in-home.css' | asset_url }}">
+<div class="page-width home-featured_in-container">
+  <h2 class="home-featured_in-heading">{{ section.settings.heading }}</h2>
+  <div class="home-featured_in-slider">
+    <div class="home-featured_in-logos">
+      {% for block in section.blocks %}
+        <div class="home-featured_in-logo-container">
+          <img
+            src="{{ block.settings.image | image_url: width: 600 }}"
+            alt="{{ block.settings.alt_text }}"
+            class="home-featured_in-logo"
+          >
+        </div>
+      {% endfor %}
+      <!-- Duplicate for seamless loop -->
+      {% for block in section.blocks %}
+        <div class="home-featured_in-logo-container">
+          <img
+            src="{{ block.settings.image | image_url: width: 600 }}"
+            alt="{{ block.settings.alt_text }}"
+            class="home-featured_in-logo"
+          >
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% schema %}
+{
+  "name": "Home Featured In",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Section Heading",
+      "default": "Featured In"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "image_picker",
+      "name": "Logo",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "alt_text",
+          "label": "Alt Text",
+          "default": "featuredinlogo Image"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Home Featured In"
+    }
+  ]
+}
+{% endschema %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const logos = document.querySelector('.home-featured_in-logos');
+    if (!logos) return;
+
+    // Get the width of one complete set of logos
+    const logosArray = Array.from(logos.querySelectorAll('.home-featured_in-logo-container'));
+    const halfCount = logosArray.length / 2;
+    
+    // Calculate width of one complete set
+    let setWidth = 0;
+    for (let i = 0; i < halfCount; i++) {
+      setWidth += logosArray[i].offsetWidth + 30; // 30px gap
+    }
+
+    // Create continuous scrolling animation using GSAP
+    gsap.to(logos, {
+      x: -setWidth,
+      duration: 45,
+      ease: 'none',
+      repeat: -1,
+      onRepeat: function() {
+        gsap.set(logos, { x: 0 });
+      }
+    });
+  });
+</script>
