@@ -1609,5 +1609,34 @@
         "label": "Enable International Flow"
       }
     ]
+  },
+  {
+    "name": "OpenAI Ads",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "ChatGPT Ads measurement pixel. Events mirror the theme's Meta Pixel events — see OPENAI-ADS-SETUP.md."
+      },
+      {
+        "type": "checkbox",
+        "id": "openai_ads_enabled",
+        "label": "Enable OpenAI Ads pixel",
+        "default": true
+      },
+      {
+        "type": "text",
+        "id": "openai_ads_pixel_id",
+        "label": "Pixel ID",
+        "default": "GNxEfvYwDmKGWysLzjYCTt",
+        "info": "From OpenAI Ads Manager > Conversions > Data sources."
+      },
+      {
+        "type": "checkbox",
+        "id": "openai_ads_debug",
+        "label": "Debug logging",
+        "default": true,
+        "info": "Logs every event to the browser console as [openai-ads]. Turn off once the Event Stream in Ads Manager shows the events."
+      }
+    ]
   }
 ]

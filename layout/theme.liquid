@@ -67,6 +67,7 @@
     <script src="{{ 'details-disclosure.js' | asset_url }}" defer="defer"></script>
     <script src="{{ 'details-modal.js' | asset_url }}" defer="defer"></script>
     <script src="{{ 'search-form.js' | asset_url }}" defer="defer"></script>
+    <script src="{{ 'openai-ads.js' | asset_url }}" defer="defer"></script>
 
     {%- if settings.animations_reveal_on_scroll -%}
       <script src="{{ 'animations.js' | asset_url }}" defer="defer"></script>
@@ -427,6 +428,8 @@
         src="https://www.facebook.com/tr?id=1058880252490692&ev=PageView&noscript=1"
     ></noscript>
     <!-- End Meta Pixel Code -->
+
+    {% render 'openai-ads-pixel' %}
     <script>
       document.addEventListener('DOMContentLoaded', () => {
         const selectors = ['.main-product_text-style_caption', '.product-card-specs'];

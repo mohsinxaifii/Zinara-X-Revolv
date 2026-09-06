@@ -1,0 +1,292 @@
+{% comment %}
+  OpenAI Ads (ChatGPT Ads) measurement pixel — base install.
+
+  Loads the oaiq SDK, initialises it with the pixel ID + advanced matching data,
+  fires page_viewed, and exposes the window.OpenAIAds helpers used by
+  assets/openai-ads.js (which mirrors this theme's Meta Pixel events) and by
+  snippets/openai-ads-product-viewed.liquid.
+
+  Docs: https://developers.openai.com/ads/measurement-pixel
+  Setup notes: OPENAI-ADS-SETUP.md in the theme root.
+{% endcomment %}
+
+{%- liquid
+  assign oai_pixel_id = settings.openai_ads_pixel_id
+  if oai_pixel_id == blank
+    assign oai_pixel_id = 'GNxEfvYwDmKGWysLzjYCTt'
+  endif
+-%}
+
+{%- if settings.openai_ads_enabled and oai_pixel_id != blank -%}
+  <!-- OpenAI Ads Pixel -->
+  <script>
+    window.OpenAIAdsConfig = {
+      enabled: true,
+      pixelId: {{ oai_pixel_id | json }},
+      debug: {{ settings.openai_ads_debug | json }},
+      currency: {{ cart.currency.iso_code | json }},
+      template: {{ template.name | json }},
+      page: {
+        id: {{ request.path | json }},
+        name: {{ page_title | json }}
+      },
+      cart: {
+        token: {{ cart.token | json }},
+        amount: {{ cart.total_price | json }},
+        item_count: {{ cart.item_count | json }},
+        items: [
+          {%- for line_item in cart.items -%}
+            {
+              key: {{ line_item.key | json }},
+              sku: {{ line_item.sku | json }},
+              variant_id: {{ line_item.variant_id | json }},
+              product_title: {{ line_item.product.title | json }},
+              quantity: {{ line_item.quantity | json }},
+              price: {{ line_item.final_price | json }}
+            }{% unless forloop.last %},{% endunless %}
+          {%- endfor -%}
+        ]
+      },
+      user: {
+        {%- if customer -%}
+          email: {{ customer.email | json }},
+          phone: {{ customer.phone | default: customer.default_address.phone | json }},
+          firstName: {{ customer.first_name | json }},
+          lastName: {{ customer.last_name | json }},
+          externalId: {{ customer.id | json }},
+          city: {{ customer.default_address.city | json }},
+          region: {{ customer.default_address.province | json }},
+          country: {{ customer.default_address.country_code | json }},
+          postalCode: {{ customer.default_address.zip | json }}
+        {%- endif -%}
+      }
+    };
+  </script>
+
+  <script>
+    !(function (w, d, s, u) {
+      if (w.oaiq) return;
+      var q = function () {
+        q.q.push(arguments);
+      };
+      q.q = [];
+      w.oaiq = q;
+      var j = d.createElement(s);
+      j.async = 1;
+      j.src = u;
+      var f = d.getElementsByTagName(s)[0];
+      f.parentNode.insertBefore(j, f);
+    })(window, document, 'script', 'https://bzrcdn.openai.com/sdk/oaiq.min.js');
+  </script>
+
+  <script>
+    (function () {
+      var config = window.OpenAIAdsConfig;
+      if (!config || !config.enabled || !config.pixelId) return;
+
+      // Always call through window.oaiq: the stub is swapped for the real SDK on load.
+      function send() {
+        if (window.oaiq) window.oaiq.apply(null, arguments);
+      }
+
+      function log() {
+        if (config.debug && window.console) {
+          console.log.apply(console, ['[openai-ads]'].concat([].slice.call(arguments)));
+        }
+      }
+
+      // `amount` is an integer in the currency's minor unit (paise/cents) — which is
+      // exactly how Shopify reports money in Liquid and in /cart.js. Values that come
+      // from this theme's Meta events are already converted to major units, so
+      // assets/openai-ads.js multiplies those back up before calling this.
+      function amount(value) {
+        var n = typeof value === 'string' ? parseFloat(value) : value;
+        if (typeof n !== 'number' || !isFinite(n)) return undefined;
+        return Math.round(n);
+      }
+
+      function eventId() {
+        if (window.crypto && window.crypto.randomUUID) return window.crypto.randomUUID();
+        return 'oai-' + Date.now() + '-' + Math.random().toString(16).slice(2);
+      }
+
+      // ---- Advanced matching -------------------------------------------------
+      // Identifiers are SHA-256 hashed in the browser; raw values never leave it.
+      function normalizeEmail(value) {
+        return String(value).trim().toLowerCase();
+      }
+
+      function normalizePhone(value) {
+        var digits = String(value).replace(/[\s().-]/g, '').replace(/^\+/, '').replace(/^0+/, '');
+        return /^[0-9]{8,15}$/.test(digits) ? digits : '';
+      }
+
+      function normalizeName(value) {
+        return String(value)
+          .toLowerCase()
+          .replace(/[\s!-\/:-@\[-`{-~]/g, '');
+      }
+
+      function sha256(value) {
+        if (!value || !window.crypto || !window.crypto.subtle || !window.TextEncoder) {
+          return Promise.resolve(undefined);
+        }
+        return window.crypto.subtle
+          .digest('SHA-256', new TextEncoder().encode(value))
+          .then(function (buffer) {
+            return Array.prototype.map
+              .call(new Uint8Array(buffer), function (byte) {
+                return ('0' + byte.toString(16)).slice(-2);
+              })
+              .join('');
+          })
+          .catch(function () {
+            return undefined;
+          });
+      }
+
+      // Identity gathered so far, stored normalized — seeded from the logged-in
+      // customer and topped up by identify() whenever a form gives us an email/phone.
+      var identity = {};
+
+      var NORMALIZERS = {
+        email: normalizeEmail,
+        phone: normalizePhone,
+        firstName: normalizeName,
+        lastName: normalizeName,
+        externalId: function (value) {
+          return String(value).trim();
+        }
+      };
+
+      function merge(raw) {
+        var changed = false;
+        if (!raw) return changed;
+        ['email', 'phone', 'firstName', 'lastName', 'externalId', 'city', 'region', 'country', 'postalCode'].forEach(
+          function (key) {
+            if (!raw[key]) return;
+            var normalizer = NORMALIZERS[key];
+            var value = normalizer ? normalizer(raw[key]) : String(raw[key]);
+            if (value && identity[key] !== value) {
+              identity[key] = value;
+              changed = true;
+            }
+          }
+        );
+        return changed;
+      }
+
+      function hashIdentity() {
+        var user = {};
+
+        if (identity.city) user.city = identity.city;
+        if (identity.region) user.region = identity.region;
+        if (identity.country) user.country = identity.country;
+        if (identity.postalCode) user.postal_code = identity.postalCode;
+
+        var fields = [
+          ['email_sha256', identity.email],
+          ['phone_number_sha256', identity.phone],
+          ['first_name_sha256', identity.firstName],
+          ['last_name_sha256', identity.lastName],
+          ['external_id_sha256', identity.externalId]
+        ];
+
+        return Promise.all(
+          fields.map(function (field) {
+            return sha256(field[1]).then(function (hash) {
+              if (hash) user[field[0]] = hash;
+            });
+          })
+        ).then(function () {
+          return user;
+        });
+      }
+
+      var initialized = false;
+
+      function initialize(raw) {
+        // Most Meta payloads repeat the same customer fields; only re-init when the
+        // identity actually improves.
+        var changed = merge(raw);
+        if (initialized && !changed) return Promise.resolve();
+        initialized = true;
+
+        return hashIdentity().then(function (user) {
+          var initConfig = { pixelId: config.pixelId, debug: !!config.debug };
+          if (Object.keys(user).length) initConfig.user = user;
+          log('init', initConfig);
+          send('init', initConfig);
+        });
+      }
+
+      // ---- Public helpers ----------------------------------------------------
+      var fired = {};
+
+      window.OpenAIAds = {
+        config: config,
+        currency: config.currency,
+        amount: amount,
+
+        track: function (eventName, data, options) {
+          var opts = options || {};
+          if (!opts.event_id) opts.event_id = eventId();
+          log('measure', eventName, data, opts);
+          send('measure', eventName, data, opts);
+        },
+
+        // Fires an event at most once per page load (guards duplicate bindings).
+        trackOnce: function (key, eventName, data, options) {
+          if (fired[key]) return;
+          fired[key] = true;
+          window.OpenAIAds.track(eventName, data, options);
+        },
+
+        // Re-initialises the pixel with better matching data once a form hands us
+        // an email/phone (try-at-home booking, video trial, newsletter, …).
+        identify: function (raw) {
+          return initialize(raw);
+        },
+
+        // Maps Shopify line items (/cart.js, /cart/add.js or the Liquid snapshot)
+        // to the `contents` shape. contents[].amount is the per-unit price.
+        contents: function (items) {
+          return (items || []).map(function (item) {
+            var unit = item.final_price;
+            if (unit === undefined) unit = item.price;
+            if (unit === undefined && item.final_line_price && item.quantity) {
+              unit = item.final_line_price / item.quantity;
+            }
+            return {
+              id: String(item.sku || item.variant_id || item.id || ''),
+              name: item.product_title || item.title || item.name || '',
+              content_type: 'product',
+              quantity: item.quantity || 1,
+              amount: amount(unit),
+              currency: config.currency
+            };
+          });
+        },
+
+        log: log
+      };
+
+      // ---- Init + page_viewed ------------------------------------------------
+      // page_viewed is fired here rather than off the Meta PageView call so it does
+      // not depend on the Meta pixel loading.
+      initialize(config.user).then(function () {
+        window.OpenAIAds.trackOnce('page_viewed', 'page_viewed', {
+          type: 'contents',
+          contents: [
+            {
+              id: config.page.id || window.location.pathname,
+              name: config.page.name || document.title,
+              content_type: 'page'
+            }
+          ]
+        });
+      });
+    })();
+  </script>
+  <!-- End OpenAI Ads Pixel -->
+{%- endif -%}

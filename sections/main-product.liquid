@@ -2415,6 +2415,8 @@ document.addEventListener('DOMContentLoaded', () => {
   </script>
 {% endif %}
 
+{% render 'openai-ads-product-viewed', product: product %}
+
 <script>
   window.product = {{ product | json }};
 </script>

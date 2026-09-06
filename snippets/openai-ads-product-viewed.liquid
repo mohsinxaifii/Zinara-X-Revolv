@@ -1,0 +1,35 @@
+{% comment %}
+  Fires the OpenAI Ads `contents_viewed` event for a product page.
+
+  Accepts:
+  - product: {Object} product object.
+
+  Usage:
+  {% render 'openai-ads-product-viewed', product: product %}
+{% endcomment %}
+
+{%- if settings.openai_ads_enabled and product != blank -%}
+  {%- assign oai_variant = product.selected_or_first_available_variant -%}
+  <script>
+    (function () {
+      var OA = window.OpenAIAds;
+      if (!OA) return;
+
+      var item = {
+        id: {{ oai_variant.sku | default: oai_variant.id | json }},
+        name: {{ product.title | json }},
+        content_type: 'product',
+        quantity: 1,
+        amount: OA.amount({{ oai_variant.price | json }}),
+        currency: OA.currency
+      };
+
+      OA.trackOnce('contents_viewed', 'contents_viewed', {
+        type: 'contents',
+        amount: item.amount,
+        currency: OA.currency,
+        contents: [item]
+      });
+    })();
+  </script>
+{%- endif -%}
