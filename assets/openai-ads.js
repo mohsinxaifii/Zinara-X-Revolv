@@ -29,7 +29,13 @@
   // ---------------------------------------------------------------------------
   var EVENT_MAP = {
     PageView: { skip: true }, // fired by snippets/openai-ads-pixel.liquid
-    add_to_cart: { event: 'items_added', shape: 'contents' },
+    // GoKwik's cart embed attaches its own capture-phase click listener to
+    // .product-form__submit and calls preventDefault (see product-form.js), so the
+    // form's `submit` event — and this fbq call — do not reliably fire. items_added
+    // is sent from the cartUpdate pub/sub below instead, which fires from inside
+    // product-form.js's own successful fetch response and is what the cart
+    // drawer/notification already depend on to render.
+    add_to_cart: { skip: true },
     checkout_initiated: { event: 'checkout_started', shape: 'contents' },
     book_trial_at_home: { event: 'appointment_scheduled', shape: 'customer_action', mirror: true },
     book_video_trial: { event: 'appointment_scheduled', shape: 'customer_action', mirror: true }
@@ -97,8 +103,39 @@
       });
   }
 
+  // Shopify's /cart/add.js returns either the single added line item flat
+  // (product-form.js) or `{ items: [...] }` for the ones just added (quick-add-bulk),
+  // never the full cart — so this is exactly the items_added payload, not a diff.
+  function contentsFromCartUpdate(cartData) {
+    if (!cartData) return null;
+    if (Array.isArray(cartData.items)) return OA.contents(cartData.items);
+    if (cartData.variant_id) return OA.contents([cartData]);
+    return null;
+  }
+
   if (typeof subscribe === 'function' && typeof PUB_SUB_EVENTS !== 'undefined') {
-    subscribe(PUB_SUB_EVENTS.cartUpdate, refreshCart);
+    subscribe(PUB_SUB_EVENTS.cartUpdate, function (event) {
+      refreshCart();
+
+      // Only 'product-form' (main/sticky add-to-cart) and 'quick-add' (collection
+      // grid quick add) represent a genuine new addition; 'cart-items' is a
+      // quantity edit on a line already in the cart.
+      if (event.source !== 'product-form' && event.source !== 'quick-add') return;
+
+      var contents = contentsFromCartUpdate(event.cartData);
+      if (!contents || !contents.length) return;
+
+      var amount = contents.reduce(function (sum, item) {
+        return sum + (item.amount || 0) * (item.quantity || 1);
+      }, 0);
+
+      OA.track('items_added', {
+        type: 'contents',
+        amount: amount,
+        currency: OA.currency,
+        contents: contents
+      });
+    });
   }
 
   // ---------------------------------------------------------------------------

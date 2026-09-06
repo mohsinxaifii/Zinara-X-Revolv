@@ -678,6 +678,12 @@ document.getElementById('cart-icon-bubble').addEventListener('click', async func
             customer_phone: customer.phone,
             customer_address: address
           });
+
+          // Redirect after slight delay (matches the shop_all / about_us links below —
+          // this one was missing it, so the click did nothing beyond tracking).
+          setTimeout(() => {
+            window.location.href = redirectUrl;
+          }, 300);
         }
 
         // Trigger 'shop_all' event for links that contain 'shop all'

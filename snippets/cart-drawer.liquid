@@ -652,7 +652,13 @@
   </div>
 </cart-drawer>
 <script>
-  document.getElementById('CartDrawer-Checkout')?.addEventListener('click', async function (e) {
+  // Listens for the early, pre-GoKwik capture-phase signal dispatched in
+  // layout/theme.liquid instead of binding directly to #CartDrawer-Checkout:
+  // GoKwik clones and replaces that button (see the comment in theme.liquid),
+  // which silently drops any listener attached straight to it. This also picks
+  // up clicks on the cart-notification and full-cart-page checkout buttons,
+  // since all three share name="checkout" and dispatch the same event.
+  document.addEventListener('theme:checkout-intent', async function () {
     try {
       const response = await fetch('/cart.js');
       const cart = await response.json();

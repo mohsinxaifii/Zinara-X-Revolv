@@ -1650,63 +1650,67 @@
         console.log('ready_to_ship fired:', {
           event_label: linkText,
           url: linkHref,
-          checkbox_status: checkbox_
-
+          checkbox_status: checkboxStatus,
+        });
+      });
+    }
+  });
+</script>
 <script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const filterSections = document.querySelectorAll('details.js-filter');
+  // Delegated on document rather than bound per-item: Dawn's own facets.js
+  // (renderFilters) replaces the innerHTML of every `.js-filter` details block
+  // that wasn't the one just toggled on each filter submission, which destroys
+  // any listener attached directly to `li.facets__item`. A direct binding here
+  // fires at most once per filter group per page load; delegation re-resolves
+  // the target on every click, so it survives every re-render.
+  document.addEventListener('click', function (event) {
+    const item = event.target.closest('details.js-filter li.facets__item');
+    if (!item) return;
+    const section = item.closest('details.js-filter');
 
-    filterSections.forEach((section) => {
+    // Delay to let checkbox update its checked state
+    setTimeout(() => {
       const headingElement = section.querySelector('summary .facets__summary-label');
       const filterHeading = headingElement ? headingElement.childNodes[0].nodeValue.trim() : 'Unknown Filter';
 
-      const listItems = section.querySelectorAll('li.facets__item');
+      const labelSpan = item.querySelector('.facet-checkbox__text-label');
+      const filterName = labelSpan ? labelSpan.textContent.trim() : 'Unknown Option';
 
-      listItems.forEach((item) => {
-        item.addEventListener('click', function () {
-          // Delay to let checkbox update its checked state
-          setTimeout(() => {
-            const labelSpan = item.querySelector('.facet-checkbox__text-label');
-            const filterName = labelSpan ? labelSpan.textContent.trim() : 'Unknown Option';
+      const checkbox = item.querySelector('input[type="checkbox"]');
+      const filterStatus = checkbox && checkbox.checked ? 'removed' : 'applied';
 
-            const checkbox = item.querySelector('input[type="checkbox"]');
-            const filterStatus = checkbox && checkbox.checked ? 'removed' : 'applied';
-
-            console.log('Filter event:', {
-              heading: filterHeading,
-              name: filterName,
-              status: filterStatus,
-            });
-
-            const eventData = {
-              event_category: 'Filter Click',
-              event_label: `${filterHeading} - ${filterName}`,
-              filter_heading: filterHeading,
-              filter_name: filterName,
-              filter_status: filterStatus,
-            };
-
-            if (typeof gtag === 'function') {
-              gtag('event', 'filter_applied', eventData);
-
-              console.log('✅ gtag event fired:', {
-                event: 'filter_applied',
-                filter_heading: filterHeading,
-                filter_name: filterName,
-                filter_status: filterStatus,
-              });
-            } else {
-              console.warn('⚠️ gtag is not defined');
-            }
-
-            // ✅ Meta Pixel tracking
-            if (typeof fbq === 'function') {
-              fbq('trackCustom', 'filter_applied', eventData);
-            }
-          }, 10); // Let checkbox update
-        });
+      console.log('Filter event:', {
+        heading: filterHeading,
+        name: filterName,
+        status: filterStatus,
       });
-    });
+
+      const eventData = {
+        event_category: 'Filter Click',
+        event_label: `${filterHeading} - ${filterName}`,
+        filter_heading: filterHeading,
+        filter_name: filterName,
+        filter_status: filterStatus,
+      };
+
+      if (typeof gtag === 'function') {
+        gtag('event', 'filter_applied', eventData);
+
+        console.log('✅ gtag event fired:', {
+          event: 'filter_applied',
+          filter_heading: filterHeading,
+          filter_name: filterName,
+          filter_status: filterStatus,
+        });
+      } else {
+        console.warn('⚠️ gtag is not defined');
+      }
+
+      // ✅ Meta Pixel tracking
+      if (typeof fbq === 'function') {
+        fbq('trackCustom', 'filter_applied', eventData);
+      }
+    }, 10); // Let checkbox update
   });
 </script>
 

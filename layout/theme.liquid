@@ -1,6 +1,34 @@
 <!doctype html>
 <html class="js" lang="{{ request.locale.iso_code }}">
   <head>
+<script>
+  // Must run before GoKwik's own script (rendered right below): GoKwik replaces
+  // every checkout button (button/input[name="checkout"]) with a clone
+  // (cloneNode + replaceChild) to attach its own checkout flow, and cloneNode
+  // does not carry over addEventListener listeners — so a click listener bound
+  // directly to #CartDrawer-Checkout etc. is attached to a node GoKwik removes
+  // from the DOM before the user ever clicks it, and never fires again.
+  //
+  // GoKwik's own capture-phase click listener (window, capture) also calls
+  // stopImmediatePropagation() once it claims the click, which blocks every
+  // OTHER listener in that same click's capture/bubble chain, including one
+  // added later via delegation on document. The only way to observe the click
+  // at all is a capture-phase listener registered on window BEFORE GoKwik's —
+  // capture-phase listeners on the same target run in registration order, and
+  // this script executes first because it is placed before GoKwik's render.
+  // It dispatches a plain custom event that survives regardless of what
+  // happens to the original click afterwards; see cart-drawer.liquid, which
+  // listens for it instead of a direct click on the button.
+  window.addEventListener(
+    'click',
+    function (event) {
+      var target = event.target.closest && event.target.closest('[name="checkout"]');
+      if (!target) return;
+      document.dispatchEvent(new CustomEvent('theme:checkout-intent', { detail: { id: target.id || null } }));
+    },
+    true
+  );
+</script>
 <!-- Gokwik theme code start -->
 <link rel="dns-prefetch" href="https://pdp.gokwik.co/">
 <link rel="dns-prefetch" href="https://api.gokwik.co">

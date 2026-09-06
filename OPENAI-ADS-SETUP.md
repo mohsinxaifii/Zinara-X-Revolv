@@ -23,8 +23,8 @@ The theme fires 33 distinct Meta events. They arrive at OpenAI like this:
 | --- | --- | --- |
 | `PageView` | `page_viewed` | Fired directly by the pixel snippet, not via the bridge, so it does not depend on Meta loading. |
 | *(new)* | `contents_viewed` | Product page view. The theme has no Meta equivalent — added because it is a core conversion event. |
-| `add_to_cart` | `items_added` | Line item + unit price + quantity. |
-| `checkout_initiated` | `checkout_started` | Line items come from a live `/cart.js` snapshot; the Meta payload only carries a joined string. |
+| `add_to_cart` | `items_added` | **Not** bridged from the fbq call — see warning below. Sourced directly from `PUB_SUB_EVENTS.cartUpdate`. |
+| `checkout_initiated` | `checkout_started` | Line items come from a live `/cart.js` snapshot; the Meta payload only carries a joined string. **Known to be unreliable** — see warning below. |
 | `book_trial_at_home` | `appointment_scheduled` **+** custom `book_trial_at_home` | Standard event so it can be an optimization goal; the custom mirror keeps the two booking types distinguishable. |
 | `book_video_trial` | `appointment_scheduled` **+** custom `book_video_trial` | Same. |
 | all 27 others | `custom` with `custom_event_name` = the Meta event name | `product_click`, `view_cart`, `filter_applied`, `try_at_home`, the `menu_*` clicks, etc. |
@@ -36,6 +36,108 @@ Advanced matching: the logged-in customer's email / phone / name / ID are SHA-25
 in the browser and passed to `oaiq("init")`. When a form event carries an email or phone
 (try-at-home booking, video trial), the bridge re-initialises with those, so the event is
 attributed to a known person. Raw values never leave the browser.
+
+## Sitewide reliability audit (2026-09-06)
+
+Went through every fbq/gtag event firing in the theme and checked how each is
+actually triggered — not just that the code looks right, but whether the DOM
+element or flow it depends on stays valid through this store's specific mix of
+AJAX re-renders (variant swap, facet filtering, cart updates) and third-party
+interference (GoKwik). Two real, previously-silent breaks were found and fixed;
+one is structural and documented but not fixed.
+
+**Fixed: `items_added` (add to cart).** Covered above — moved off the `submit`
+DOM event onto `PUB_SUB_EVENTS.cartUpdate`.
+
+**Fixed: `checkout_started` / `checkout_initiated`.** GoKwik's `attach()` scans
+for `button[name="checkout"], input[name="checkout"]` sitewide and replaces each
+one via `cloneNode(true)` + `replaceChild` (`snippets/gokwik.liquid` ~line 658) to
+attach its own checkout flow. `cloneNode` copies attributes (so the clone keeps
+`id="CartDrawer-Checkout"` and `name="checkout"`) but never copies
+`addEventListener` listeners, so the click listener in `cart-drawer.liquid` that
+fired `checkout_initiated` was attached to a node GoKwik removes from the DOM
+before a real user ever clicks it — it could not have fired since GoKwik started
+claiming that button.
+
+There is no way to observe the click via normal delegation afterwards either:
+GoKwik's own capture-phase listener on `window` (registered at the very top of
+`<head>`) calls `stopImmediatePropagation()` once it claims the click, which
+blocks every listener registered after it for that dispatch, including one added
+via `document.addEventListener(..., true)` anywhere later in the page.
+
+**Fix applied:** a capture-phase `click` listener is registered on `window` at
+the very top of `<head>` in `layout/theme.liquid`, before GoKwik's own script
+renders. Capture-phase listeners on the same target fire in registration order,
+so this one runs and dispatches a plain `theme:checkout-intent` custom event
+*before* GoKwik's listener gets to stop anything — dispatching a new event is
+unaffected by `stopImmediatePropagation()` on the original click, since that only
+blocks further listeners in the *original* click's chain. `cart-drawer.liquid`
+now listens for `theme:checkout-intent` instead of a direct click on
+`#CartDrawer-Checkout`. Verified against a simulation of GoKwik's exact
+clone-and-stop behavior before shipping.
+
+This also unifies coverage: the same selector matches the checkout buttons in
+`cart-notification.liquid` and `sections/main-cart-footer.liquid`, neither of
+which had *any* tracking before (only the cart drawer's button did) — a click on
+any of the three now fires `checkout_started`. Only the drawer's cart type is
+live on this store today (`cart_type: drawer` in `config/settings_data.json`);
+if that setting is ever switched to `notification` or `page`, the listener body
+itself (in `cart-drawer.liquid`) stops being rendered and would need to move to
+a snippet included regardless of cart type.
+
+**Fixed: `filter_applied` and `ready_to_ship` were both completely dead —
+a truncated script tag.** `snippets/facets.liquid`'s `ready_to_ship` script
+(~line 1618) was cut off mid-statement with no closing `});` or `</script>`.
+Browsers scan for the literal text `</script>` to close a script element,
+ignoring any `<script>` tags found inside it — so everything from that broken
+script through the *next* real `</script>` (which was `filter_applied`'s,
+~90 lines later) was being parsed by the browser as **one script**, containing
+a truncated object literal and bare `<script>` tokens partway through. That is a
+syntax error, and a syntax error in a `<script>` block means none of it runs —
+so neither event could ever have fired, on any page, regardless of GoKwik.
+Completed the truncated statement and closed the tag properly.
+
+**Fixed: `filter_applied` also didn't survive a facet re-render.** Once the
+script was actually valid JS, it still had a real bug: Dawn's own
+`assets/facets.js` (`renderFilters`) replaces the `innerHTML` of every
+`.js-filter` details block that wasn't the one just toggled, on every filter
+submission — normal, filters are meant to update counts across all groups. The
+listener was bound directly to each `li.facets__item` at page load, so it
+survived exactly one click per filter group and silently stopped after that.
+Rewritten as delegation on `document` (`event.target.closest(...)`), which
+re-resolves the target on every click and is immune to the element being
+replaced. `ready_to_ship`'s own link sits outside the facet groups entirely
+(a static link to `/collections/ready-to-ship`), so it was never affected by
+this specific issue — only by the truncation.
+
+**Fixed, unrelated to tracking:** the header's `.c-menu2` "Try at Home" link
+(`sections/header.liquid`) called `preventDefault()` but — unlike its `shop_all`
+and `about_us` siblings in the same handler — never redirected afterward, so the
+click did nothing beyond firing tracking. Added the missing redirect.
+
+**Checked and already reliable, no change needed:** `add_product_tryathome` /
+`remove_product_tryathome` (properly deduped with `removeEventListener` before
+re-adding), `select_time_slot_tryathome`, `book_trial_at_home` /
+`book_video_trial`, `view_cart`, `view_wishlist`, `view_product_list`,
+`product_click`, `category_click`, `occasion_click`, `home_banner_click`,
+`home_carousel_banner`, `try_at_home` (all three separate bindings: header
+desktop menu, header burger drawer, homepage try-at-home section — each scoped
+to its own element/source, not duplicates of each other), `menu_click` and the
+other `menu_*` drawer events (all null-guarded, bound to the static mobile menu
+drawer which isn't AJAX-replaced), `price_breakdown` and `check_availability_ship`
+(both live inside `<product-info>`, whose inline scripts Dawn's own
+`HTMLUpdateUtility.viewTransition` deliberately re-executes on every variant
+swap — confirmed in `assets/global.js`), `check_availability_tryathome` (its
+button lives outside `<product-info>`, in the static part of the page, so it's
+never touched by a variant swap).
+
+**Noted, not fixed (not a tracking issue):** `snippets/facets.liquid` (~line
+1603) hides certain filter values using a hardcoded, page-specific section ID
+(`#Facet-3-template--24203645616312__product-grid`) instead of
+`{{ section.id }}` — works only on the one page that ID happened to belong to
+when it was written, silently does nothing on every other collection page.
+Flagging since it's directly adjacent to what was audited, but it's a filter
+display bug, not a conversion-tracking one, so left alone.
 
 ## Ads Manager — conversions (already created)
 
