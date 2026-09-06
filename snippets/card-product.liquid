@@ -40,7 +40,15 @@
       assign ratio = 1
     endif
   -%}
-  <div class="card-wrapper product-card-wrapper underline-links-hover">
+  <div
+    class="card-wrapper product-card-wrapper underline-links-hover"
+    data-title="{{ card_product.title | escape }}"
+    data-handle="{{ card_product.handle }}"
+    data-price="{{ card_product.price }}"
+    data-compare-price="{{ card_product.compare_at_price }}"
+    data-tags="{{ card_product.tags | join: ',' }}"
+    data-vendor="{{ card_product.vendor | escape }}"
+  >
     <div
       class="
         card card--{{ settings.card_style }}

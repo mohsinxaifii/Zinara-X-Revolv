@@ -262,12 +262,6 @@
                 {%- endif -%}
                 <li
                   class="grid__item{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
-                  data-title="{{ product.title | escape }}"
-                  data-handle="{{ product.handle }}"
-                  data-price="{{ product.price | money }}"
-                  data-compare-price="{{ product.compare_at_price | money }}"
-                  data-tags="{{ product.tags | join: ',' }}"
-                  data-vendor="{{ product.vendor | escape }}"
                   {% if settings.animations_reveal_on_scroll %}
                     data-cascade
                     style="--animation-order: {{ forloop.index }};"
@@ -302,74 +296,6 @@
     {{ 'mask-arch.svg' | inline_asset_content }}
   {%- endif -%}
 </div>
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-
-  const customerData = {
-    email: {{ customer.email | json | default: null }},
-    id: {{ customer.id | json | default: null }},
-    first_name: {{ customer.first_name | json | default: null }},
-    last_name: {{ customer.last_name | json | default: null }},
-    phone: {{ customer.phone | json | default: null }}
-  };
-
-  const gridItems = document.querySelectorAll('#product-grid li.grid__item');
-
-  gridItems.forEach(function (item) {
-    item.addEventListener('click', function () {
-
-      const price = parseFloat(item.dataset.price || 0);
-      const comparePrice = parseFloat(item.dataset.comparePrice || 0);
-
-      const eventData = {
-        // 🔹 Core event info
-        event: 'product_click',
-        event_category: 'Product Grid',
-        event_label: item.dataset.title || '',
-
-        // 🔹 Product data
-        product_handle: item.dataset.handle || '',
-        price: price,
-        compare_at_price: comparePrice,
-        value: price,
-        currency: 'INR',
-        vendor: item.dataset.vendor || '',
-        tags: item.dataset.tags ? item.dataset.tags.split(',') : [],
-
-        // 🔹 Page data (matches GTM list)
-        page_location: window.location.href,
-        page_referrer: document.referrer || '',
-        page_title: document.title,
-
-        // 🔹 Customer data
-        customer_id: customerData.id,
-        customer_email: customerData.email,
-        customer_first_name: customerData.first_name,
-        customer_last_name: customerData.last_name,
-        customer_phone: customerData.phone
-      };
-
-      // 👉 Push to dataLayer (primary for GTM)
-      window.dataLayer = window.dataLayer || [];
-      window.dataLayer.push(eventData);
-
-      // 👉 GA4 direct (optional)
-      if (typeof gtag === 'function') {
-        gtag('event', 'product_click', eventData);
-      }
-
-      // 👉 Meta (optional)
-      if (typeof fbq === 'function') {
-        fbq('trackCustom', 'product_click', eventData);
-      }
-
-      console.log('product_click fired:', eventData);
-
-    });
-  });
-
-});
-</script>
 
 {% schema %}
 {
