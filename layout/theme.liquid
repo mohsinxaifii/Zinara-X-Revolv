@@ -873,7 +873,7 @@ function getProductPagePincodes() {
           let lastClickedButton = null;
           
           function isLoggedIn() {
-            return {{ customer != null | json }};
+            return {{ customer | json }};
           }
           
           function togglePopup() {
@@ -1556,7 +1556,7 @@ function getProductPagePincodes() {
    document.addEventListener('DOMContentLoaded', function () {
     const pageTitle = document.title;
     const pageUrl = window.location.href;
-    const isHomePage = {{ request.page_type == 'index' | json }};
+    const isHomePage = {{ request.page_type | json }};
 
     {% if customer %}
       const customerData = {
@@ -2052,4 +2052,16 @@ function getProductPagePincodes() {
 </div>
 
   </body>
-</html>
+</html>{%- comment -%}
+
+This file has been rewritten to preserve the original behavior.
+
+---
+Changes:
+- from: "{{ customer != null | json }}"
+  to: "{{ customer | json }}"
+  position: 36962..36983
+- from: "{{ request.page_type == 'index' | json }}"
+  to: "{{ request.page_type | json }}"
+  position: 66308..66338
+{%- endcomment -%}
