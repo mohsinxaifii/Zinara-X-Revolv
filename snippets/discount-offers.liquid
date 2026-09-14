@@ -33,7 +33,6 @@
 {% endcomment %}
 {%- assign offers = shop.metaobjects.discount_offer.values | sort: 'index' -%}
 {%- capture offer_cards_html -%}
-  {%- assign rendered_offer_keys = '' -%}
   {%- for offer in offers -%}
     {%- assign offer_products = offer.products.value -%}
     {%- assign offer_collections = offer.collections.value -%}
@@ -58,25 +57,6 @@
       {%- continue -%}
     {%- endif -%}
 
-    {%- comment -%}
-      Guard against duplicate metaobject entries (the same coupon saved twice in
-      the admin, or one entry that ends up in `values` more than once): hash the
-      fields that make up the visible card and skip any signature already drawn.
-    {%- endcomment -%}
-    {%- capture offer_signature -%}
-      {{- offer.discount_code | strip | downcase -}}|
-      {{- offer.heading | strip | downcase -}}|
-      {{- offer.highlight_text | strip | downcase -}}|
-      {{- offer.description | strip | downcase -}}|
-      {{- offer.cta_text | strip | downcase -}}|{{- offer.cta_url -}}
-    {%- endcapture -%}
-    {%- assign offer_key = offer_signature | strip | md5 -%}
-    {%- assign offer_key_token = '[' | append: offer_key | append: ']' -%}
-    {%- if rendered_offer_keys contains offer_key_token -%}
-      {%- continue -%}
-    {%- endif -%}
-    {%- assign rendered_offer_keys = rendered_offer_keys | append: offer_key_token -%}
-
     {%- assign is_copyable = false -%}
     {%- if offer.discount_code != blank -%}
       {%- assign is_copyable = true -%}
@@ -84,10 +64,10 @@
     <div
       class="discount-offer-card{% if is_copyable %} discount-offer-card--copyable{% endif %}"
       role="listitem"
-      data-offer-key="{{ offer_key }}"
       {% if is_copyable %}
         data-discount-code="{{ offer.discount_code | escape }}"
         tabindex="0"
+        role="button"
         aria-label="Copy discount code {{ offer.discount_code | escape }}"
       {% endif %}
     >
@@ -149,12 +129,7 @@
   {%- endfor -%}
 {%- endcapture -%}
 {%- if offer_cards_html != blank -%}
-  <div
-    class="discount-offers-block"
-    id="Discounts-{{ block.id }}"
-    data-discount-offers-key="{{ block.id }}"
-    {{ block.shopify_attributes }}
-  >
+  <div class="discount-offers-block" id="Discounts-{{ block.id }}" {{ block.shopify_attributes }}>
     {%- if block.settings.show_heading and block.settings.heading != blank -%}
       <h3 class="discount-offers-block__heading">{{ block.settings.heading }}</h3>
     {%- endif -%}
@@ -296,54 +271,7 @@
 
   <script>
     (function () {
-      // Removes any copy of the block, or of an individual card, that is on the
-      // page more than once. Runtime duplicates come from the variant swap:
-      // HTMLUpdateUtility.viewTransition() inserts the incoming <product-info>
-      // in front of the outgoing one and only removes the outgoing node 500ms
-      // later, so for that window the page holds two of every card (and it
-      // re-executes this script, hence the global-listener guard below).
-      function dedupeDiscountOffers() {
-        var groups = Object.create(null);
-
-        document.querySelectorAll('.discount-offers-block').forEach(function (block) {
-          var key = block.dataset.discountOffersKey || 'default';
-          (groups[key] = groups[key] || []).push(block);
-        });
-
-        Object.keys(groups).forEach(function (key) {
-          var blocks = groups[key];
-          if (blocks.length < 2) return;
-          // The outgoing copy sits inside a display:none <product-info>, so it
-          // has no offsetParent; the incoming copy is inserted first in
-          // document order. Keep the first rendered one, drop the rest.
-          var visible = blocks.filter(function (block) {
-            return block.offsetParent !== null;
-          });
-          var keep = visible.length ? visible[0] : blocks[0];
-          blocks.forEach(function (block) {
-            if (block !== keep) block.remove();
-          });
-        });
-
-        // Same card twice inside one block (duplicate metaobject entries are
-        // already filtered server-side; this covers anything that slips past).
-        document.querySelectorAll('.discount-offers-block').forEach(function (block) {
-          var seen = Object.create(null);
-          block.querySelectorAll('.discount-offer-card').forEach(function (card) {
-            var key = card.dataset.offerKey || card.getAttribute('data-discount-code');
-            if (!key) return;
-            if (seen[key]) {
-              card.remove();
-              return;
-            }
-            seen[key] = true;
-          });
-        });
-      }
-
       function initDiscountOffers() {
-        dedupeDiscountOffers();
-
         document.querySelectorAll('.discount-offers-block').forEach(function (block) {
           if (block.dataset.discountOffersReady === 'true') return;
           block.dataset.discountOffersReady = 'true';
@@ -440,39 +368,29 @@
         }
       }
 
-      // <product-info> is replaced with fresh server HTML on every variant
-      // change and its inline scripts are re-executed, so this IIFE runs again
-      // for each swap. Bind the document-level listeners only on the first run
-      // — otherwise they stack and one tap copies (and animates) N times.
-      if (!window.discountOffersListenersBound) {
-        window.discountOffersListenersBound = true;
+      document.addEventListener('click', function (event) {
+        var card = event.target.closest('.discount-offer-card--copyable');
+        if (!card) return;
+        if (event.target.closest('a')) return;
+        copyDiscountCode(card);
+      });
 
-        document.addEventListener('click', function (event) {
-          var card = event.target.closest('.discount-offer-card--copyable');
-          if (!card) return;
-          if (event.target.closest('a')) return;
-          copyDiscountCode(card);
-        });
-
-        document.addEventListener('keydown', function (event) {
-          if (event.key !== 'Enter' && event.key !== ' ') return;
-          var card = event.target.closest && event.target.closest('.discount-offer-card--copyable');
-          if (!card) return;
-          event.preventDefault();
-          copyDiscountCode(card);
-        });
-
-        // Re-run the (idempotent) init for the nodes that came in with the swap.
-        document.addEventListener('product-info:swapped', function () {
-          initDiscountOffers();
-        });
-      }
+      document.addEventListener('keydown', function (event) {
+        if (event.key !== 'Enter' && event.key !== ' ') return;
+        var card = event.target.closest && event.target.closest('.discount-offer-card--copyable');
+        if (!card) return;
+        event.preventDefault();
+        copyDiscountCode(card);
+      });
 
       if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initDiscountOffers);
       } else {
         initDiscountOffers();
       }
+      // <product-info> is replaced with fresh server HTML on every variant
+      // change, so re-run the (idempotent) init for the new nodes.
+      document.addEventListener('product-info:swapped', initDiscountOffers);
     })();
   </script>
 {%- endif -%}
